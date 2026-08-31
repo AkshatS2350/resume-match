@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "resumematch"
+version = "0.1.0"
+description = "Privacy-first deterministic job-application decision engine"
+readme = "../README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi==0.115.12",
+    "pydantic==2.10.6",
+    "uvicorn==0.34.0",
+]
+
+[dependency-groups]
+dev = [
+    "hypothesis==6.127.4",
+    "import-linter==2.1",
+    "mypy==1.15.0",
+    "pytest==8.3.5",
+    "ruff==0.9.10",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
