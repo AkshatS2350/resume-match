@@ -96,24 +96,24 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 - [ ] 2.1 [P0] Write the `import-linter` layering contract
   - Files: `.importlinter`
-  - Work: add `[importlinter:contract:layers]` with the ten layers in the design's order, `root_packages = resumematch`, `include_external_packages = True`.
+  - Work: add `[importlinter:contract:layers]` with the ten layers in the design's order, the pinned-tool-compatible multiline `root_packages` list containing only `resumematch`, and `include_external_packages = True`.
   - Depends on: 1.2
   - _Requirements: RM-API-001 c6_ · _Design: Import contracts; D-01_
   - Done when: `lint-imports --config .importlinter` exits 0; adding a temporary `from resumematch.api import app` to `resumematch/core/__init__.py` makes it exit non-zero naming the `layers` contract; the temporary import is removed.
 
 - [ ] 2.2 [P0] Write the deny-by-default egress and provider-interface contracts
   - Files: `.importlinter`
-  - Work: add `[importlinter:contract:egress]` and `[importlinter:contract:provider_api]` exactly as specified in the design — `source_modules = resumematch`, forbidden transport and SDK modules, `allow_indirect_imports = False`, and `ignore_imports` naming only `resumematch.llm.providers.*`, `resumematch.job.adapters.*`, `resumematch.core.egress`, `resumematch.llm.gateway`, and `resumematch.api.composition`.
+  - Work: add `[importlinter:contract:egress]` and `[importlinter:contract:provider_api]` exactly as specified in the design — `source_modules = resumematch`, v2.1-compatible top-level forbidden transport and SDK modules, `allow_indirect_imports = False`, and `ignore_imports` naming only `resumematch.llm.providers.*`, `resumematch.job.adapters.*`, `resumematch.core.egress`, `resumematch.llm.gateway`, and `resumematch.api.composition`. Set `unmatched_ignore_imports_alerting = none` only to allow these intentionally future-only exceptions before their modules exist; it must not suppress an actual forbidden import.
   - Depends on: 2.1
   - _Requirements: RM-PRIV-003 c1, c11; RM-TEST-001 c8, c11_ · _Design: The adopted mechanism, Layer 1; D-02_
-  - Done when: `lint-imports` exits 0; a temporary `import httpx` added to `resumematch/coach/__init__.py` fails the build naming the `egress` contract; a temporary indirect chain (`coach` → new helper module → `httpx`) also fails, proving `allow_indirect_imports = False` is effective; both temporaries removed.
+  - Done when: `lint-imports` exits 0 while the future-only ignores are unmatched; a temporary `import httpx` added to `resumematch/coach/__init__.py` fails the build naming the `egress` contract; a temporary indirect chain (`coach` → new helper module → `httpx`) also fails, proving `allow_indirect_imports = False` is effective; both temporaries removed.
 
-- [ ] 2.3 [P0] Write the persistence, sanitization-record, and scoring-determinism contracts
-  - Files: `.importlinter`
-  - Work: add the `persistence` (no `sqlalchemy`/`sqlite3`/`psycopg`/`asyncpg` outside `resumematch.job.store.*`), `sanitization_record` (only `resumematch.privacy.sanitizer` may import `resumematch.core.session_write`), and `scoring_determinism` (no `random`/`secrets`/`time`/`uuid`/`os` in `rubric`, `matching`, `job.requirements`) contracts.
+- [ ] 2.3 [P0] Write the persistence, sanitization-record, and scoring-determinism boundaries
+  - Files: `.importlinter`, `backend/src/resumematch/job/requirements/__init__.py`, `tools/check_session_write_boundary.py`, `backend/tests/tools/test_check_session_write_boundary.py`
+  - Work: create `resumematch.job.requirements` as an intentionally empty architectural boundary whose `__init__.py` contains only a module docstring; this is not RM-REQX implementation. Add the remaining valid import-linter contracts: `persistence` (no `sqlalchemy`/`sqlite3`/`psycopg`/`asyncpg` outside `resumematch.job.store.*`) and `scoring_determinism` (no `random`/`secrets`/`time`/`uuid`/`os` in `rubric`, `matching`, `job.requirements`). Do not broaden the latter to all of `resumematch.job`. Add the dedicated AST/static session-write checker: only `resumematch.privacy.sanitizer` may import or literally dynamically import `resumematch.core.session_write`; it reports the file, line, and violated rule. Do not express this sibling-safe boundary as an import-linter contract.
   - Depends on: 2.1
   - _Requirements: RM-PRIV-003 c6; RM-JOB-007 c1; RM-SCORE-003 c2; RM-MATCH-005 c3_ · _Design: Import contracts; D-09, D-15, D-20_
-  - Done when: `lint-imports` exits 0 with all five contracts present; a temporary `import time` in `resumematch/rubric/__init__.py` fails naming `scoring_determinism`; removed.
+  - Done when: `lint-imports` exits 0 with the remaining valid contracts present; the session-write checker and its tests pass; a permitted Sanitizer import passes; a temporary forbidden import outside `privacy.sanitizer` is rejected by the checker; a temporary `import time` in `resumematch/rubric/__init__.py` fails naming `scoring_determinism`; all probes removed.
 
 - [ ] 2.4 [P0] Implement `tools/check_egress.py` — the AST escape-hatch check
   - Files: `tools/check_egress.py`, `backend/tests/tools/test_check_egress.py`
@@ -199,7 +199,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - Work: the only module able to mutate `Session._sanitized_resume` and `Session._sanitization_record`, exposing `write_sanitization_record(session, resume, record)`. Define `SanitizationRecord` (frozen: `content_hash`, `profile_revision`, `produced_at`, `pii_policy_version`, `detector_versions`, `placeholder_set_version`, `removed_categories`, `fail_safe_redaction_count`).
   - Depends on: 3.7, 2.3
   - _Requirements: RM-PRIV-003 c6_ · _Design: Sanitization record and the write capability; D-08, D-09_
-  - Done when: `lint-imports` exits 0; a temporary import of `core.session_write` from `resumematch/coach/__init__.py` fails the `sanitization_record` contract naming the module; the test asserts no other module in `backend/src` imports it (`grep` assertion) and that writing sets both fields atomically.
+  - Done when: `lint-imports` exits 0; `tools/check_session_write_boundary.py` exits non-zero for a temporary import of `core.session_write` from `resumematch/coach/__init__.py` and reports the file, line, and `session_write_boundary` rule; the runtime/unit test asserts only the Sanitizer uses the capability and that writing sets both fields atomically.
 
 - [ ] 3.9 [P0] Implement the single-worker startup guard
   - Files: `backend/src/resumematch/api/app.py`, `backend/tests/unit/api/test_worker_guard.py`

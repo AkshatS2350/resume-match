@@ -45,7 +45,7 @@ Consolidated view of every non-obvious decision made in this document. Detail fo
 | D-06 | LLM_Gateway requests carry **field paths only**, never candidate values; the gateway resolves values itself | **Locked** | RM-PRIV-003 c2, c3, c9 | Makes "is this a projection?" true by construction rather than by a comparison the caller could game | Requires amendment |
 | D-07 | JSON Pointer (RFC 6901) as the field-path representation, over canonical-JSON serialization | **Provisional** | RM-PRIV-003 c2, c8; RM-LLM-003 c6; RM-PRIV-004 c7 | Standard, unambiguous, array-index-addressable, one string per path | Reverse if array-index paths prove unstable across profile edits; alternative is stable per-item UUID paths |
 | D-08 | `SanitizationRecord` keyed by SHA-256 of canonical JSON, plus a monotonic `profile_revision` integer | **Locked** | RM-PRIV-003 c6, c9, c10 | c10 requires detecting post-sanitization profile edits without wall-clock | Requires amendment |
-| D-09 | Write-token capability so only `privacy.sanitizer` can write the sanitization record | **Locked** | RM-PRIV-003 c6 | c6 says "only component permitted to write"; enforced the same way as D-03 | Requires amendment |
+| D-09 | Write-token capability so only `privacy.sanitizer` can write the sanitization record | **Locked** | RM-PRIV-003 c6 | c6 says "only component permitted to write"; enforced by the private capability and dedicated static boundary checker | Requires amendment |
 | D-10 | Synchronous request/response pipeline; **no task queue, no polling** | **Locked** | RM-PERF-001 c1–c3; Non-Goal 13 | Every budget is well inside an HTTP timeout; a queue is explicitly a non-goal | Requires amendment; would need p95 extraction > 15 s on `perf-ref-1` |
 | D-11 | Pipeline split across separate endpoints per stage so the client can name the running stage | **Locked** | RM-PERF-001 c4 | A single synchronous call cannot report intermediate stages without SSE | Requires amendment |
 | D-12 | Requirement extraction happens **at ingestion time** and is cached on the Job_Posting | **Locked** | RM-PERF-001 c3; RM-REQX-001 c1 | 200 postings × up to 200 units cannot be extracted inside a 3 s match budget | Requires amendment |
@@ -86,6 +86,7 @@ Consolidated view of every non-obvious decision made in this document. Detail fo
 | D-47 | First live job source | **Deferred** (OD-05) | RM-JOB-002 c4 | Needed by M6 | — |
 | D-48 | Employer/institution retention opt-out toggle | **Deferred** (OD-04) | RM-PRIV-002 policy table | Needed by M3 | — |
 | D-49 | Deployment platform | **Deferred** (OD-11) | RM-DEP-001 | Needed pre-v1 | — |
+| D-50 | `import-linter==2.1` compatibility syntax and early empty `job.requirements` boundary | **Locked** | RM-API-001 c6; RM-PRIV-003 c1, c6, c11; RM-JOB-007 c1; RM-SCORE-003 c2; RM-MATCH-005 c3 | Preserves the original deny-by-default contracts using the pinned tool's supported list and external-module forms; prevents a future-only package from making M0 red | Requires amendment |
 | D-50 | Rubric promotion beyond `draft` | **Deferred** (OD-13) | RM-RUB-003 c10 | Needed for `reviewed` status, not for M4 | — |
 
 ---
@@ -343,7 +344,8 @@ resumematch/
 
 ```ini
 [importlinter]
-root_packages = resumematch
+root_packages =
+    resumematch
 include_external_packages = True
 
 [importlinter:contract:layers]
@@ -369,13 +371,13 @@ forbidden_modules =
     httpx
     requests
     aiohttp
-    urllib.request
-    http.client
+    urllib
+    http
     socket
     ssl
     openai
     anthropic
-    google.generativeai
+    google
     ollama
 allow_indirect_imports = False
 ignore_imports =
@@ -383,6 +385,7 @@ ignore_imports =
     resumematch.job.adapters.* -> *
     resumematch.core.egress -> httpx
     resumematch.core.egress -> socket
+unmatched_ignore_imports_alerting = none
 
 [importlinter:contract:provider_api]
 name = Only the gateway may see the LLM_Provider interface (RM-PRIV-003 c1)
@@ -393,20 +396,19 @@ ignore_imports =
     resumematch.llm.gateway -> resumematch.llm.provider_api
     resumematch.llm.providers.* -> resumematch.llm.provider_api
     resumematch.api.composition -> resumematch.llm.provider_api
-
-[importlinter:contract:sanitization_record]
-name = Only the Sanitizer may write a sanitization record (RM-PRIV-003 c6)
-type = forbidden
-source_modules = resumematch
-forbidden_modules = resumematch.core.session_write
-ignore_imports = resumematch.privacy.sanitizer -> resumematch.core.session_write
+unmatched_ignore_imports_alerting = none
 
 [importlinter:contract:persistence]
 name = Only the job store may touch the database (RM-JOB-007 c1)
 type = forbidden
 source_modules = resumematch
-forbidden_modules = sqlalchemy, sqlite3, psycopg, asyncpg
+forbidden_modules =
+    sqlalchemy
+    sqlite3
+    psycopg
+    asyncpg
 ignore_imports = resumematch.job.store.* -> *
+unmatched_ignore_imports_alerting = none
 
 [importlinter:contract:scoring_determinism]
 name = Scoring modules exclude clock and randomness (RM-SCORE-003 c2, RM-MATCH-005 c3)
@@ -415,8 +417,24 @@ source_modules =
     resumematch.rubric
     resumematch.matching
     resumematch.job.requirements
-forbidden_modules = random, secrets, time, uuid, os
+forbidden_modules =
+    random
+    secrets
+    time
+    uuid
+    os
 ```
+
+`import-linter==2.1` parses INI lists only in multiline form, so the single root and
+all multi-module fields use that form. It accepts external forbidden targets only at a
+top-level package or module, so `urllib`, `http`, and `google` intentionally cover and
+therefore strengthen the originally named `urllib.request`, `http.client`, and
+`google.generativeai` targets. The early contracts also name enclave and composition
+modules before their implementation tasks; `unmatched_ignore_imports_alerting = none`
+permits only those absent future exceptions. It does not suppress an actual matching
+forbidden import, which continues to fail the contract. `job.requirements` is an
+intentionally empty architectural package from M0 so scoring determinism remains
+scoped to requirement extraction rather than being broadened to all of `job`.
 
 Two properties of these contracts matter more than their contents:
 
@@ -783,12 +801,12 @@ class SanitizationRecord(BaseModel):
     removed_categories: tuple[str, ...]        # for RM-PRIV-004 c1
     fail_safe_redaction_count: int             # for RM-PRIV-004 c5
 
-# core/session_write.py  — import-restricted to privacy.sanitizer (D-09 contract)
+# core/session_write.py  — private mutation capability (D-09)
 def write_sanitization_record(session: Session, resume: SanitizedResume,
                               record: SanitizationRecord) -> None: ...
 ```
 
-`Session.sanitization_record` and `Session.sanitized_resume` are read-only properties on the Session object. The only mutator lives in `core/session_write.py`, which the `sanitization_record` import contract restricts to `resumematch.privacy.sanitizer`. RM-PRIV-003 c10 is satisfied by the `profile_revision` comparison: every mutation of the Candidate_Profile increments the counter, so any request built after an edit fails step 2 without consulting a clock.
+`Session.sanitization_record` and `Session.sanitized_resume` are read-only properties on the Session object. The only mutator lives in `core/session_write.py`. The dedicated AST/static checker at `tools/check_session_write_boundary.py` permits imports or literal dynamic imports of that module only from `resumematch.privacy.sanitizer`; Task 3.8 adds the runtime/unit test that only the Sanitizer uses the capability. This invariant is not enforced by import-linter because import-linter 2.1 cannot express the sibling-safe rule from the `resumematch` source root. RM-PRIV-003 c10 is satisfied by the `profile_revision` comparison: every mutation of the Candidate_Profile increments the counter, so any request built after an edit fails step 2 without consulting a clock.
 
 **Privacy_Inspector data (RM-PRIV-004 c2, c6, c7).** The gateway holds the pending admitted payload before consent and exposes three distinct views:
 
