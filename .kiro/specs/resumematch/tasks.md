@@ -173,14 +173,14 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-PARSE-004 c6; RM-SCORE-003 c3; RM-MATCH-005 c4; RM-EXT-002 c2, c4; RM-RUB-002 c3_ · _Design: Version stamping_ · _Property: 43_
   - Done when: the model is `frozen=True, extra="forbid"`; a test asserts every field named in the design's `VersionStamp` listing is present and that omitting a non-optional field raises a validation error.
 
-- [ ] 3.5 [P0] Implement `core/errors.py` — the single error taxonomy
+- [x] 3.5 [P0] Implement `core/errors.py` — the single error taxonomy
   - Files: `backend/src/resumematch/core/errors.py`, `backend/tests/unit/core/test_errors.py`
   - Work: `ErrorCode` closed enum containing every code in the design's error table, `PipelineStage` enum, `ErrorDetail`, `ErrorResponse` (frozen, `extra="forbid"`, with `code`, `message`, `stage`, `details`, `retryable`, `context`), and one exception class per fail-closed path carrying its code. `guidance_unavailable` is deliberately **not** an `ErrorCode`.
   - Depends on: 1.2
   - _Requirements: RM-API-001 c3; RM-PARSE-004 c5_ · _Design: One error taxonomy_ · _Property: 45_
   - Done when: a test asserts every code string in the design's error table is a member of `ErrorCode`; asserts `"guidance_unavailable"` is not a member; asserts `context` values are constrained to `str | int` so a candidate-derived object cannot be placed there.
 
-- [ ] 3.6 [P0] Implement `core/telemetry.py` with enforced allow-lists
+- [x] 3.6 [P0] Implement `core/telemetry.py` with enforced allow-lists
   - Files: `backend/src/resumematch/core/telemetry.py`, `backend/tests/unit/core/test_telemetry.py`
   - Work: `METRIC_ALLOWLIST` and `LOG_FIELD_ALLOWLIST` frozensets exactly as listed in the design. `emit_metric(name, ...)` and `emit_log(**fields)` raise on any name or field outside the allow-list. Structured JSON log records only. An exception wrapper that replaces a message with `f"{type(exc).__name__} at {stage} [redacted]"` unless the exception is one of the taxonomy's own types.
   - Depends on: 3.5
