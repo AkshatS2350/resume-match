@@ -224,28 +224,28 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-PRIV-003 c1_ · _Design: Layer 2 — injected capability; D-03_
   - Done when: `grep -rn "issue_grant\|SystemClock(" backend/src` matches only lines in `api/composition.py`; a test asserts no module-level mutable singleton is exposed (module has no non-callable public attribute holding a constructed collaborator).
 
-- [ ] 4.3 [P0] Implement the session lifecycle endpoints and header-based session scoping
+- [x] 4.3 [P0] Implement the session lifecycle endpoints and header-based session scoping
   - Files: `backend/src/resumematch/api/routers/sessions.py`, `backend/src/resumematch/api/dto/session.py`, `backend/tests/integration/test_session_endpoints.py`
   - Work: `POST /api/v1/sessions` returning the opaque token, `expires_at`, and `session_start_date`; `DELETE /api/v1/sessions` discarding all Session state and returning confirmation. The token travels in an `X-Session-Token` request header, **not** in the URL path.
   - Depends on: 4.1, 4.2
   - _Requirements: RM-SESS-001 c1; RM-PRIV-001 c8_ · _Design: API Boundaries; Resolved Specification Amendments_
   - Done when: a test asserts the created token decodes to no candidate-derived content and is at least 32 bytes of entropy; a test asserts no registered route pattern contains `{token}`; a test asserts `DELETE` then any subsequent request returns `SESSION_NOT_FOUND`.
 
-- [ ] 4.4 [P0] Implement the security baseline: CORS, rate limiting, transport headers, `.env.example`
+- [x] 4.4 [P0] Implement the security baseline: CORS, rate limiting, transport headers, `.env.example`
   - Files: `backend/src/resumematch/api/app.py`, `backend/src/resumematch/api/ratelimit.py`, `.env.example`, `backend/tests/integration/test_security_baseline.py`
   - Work: CORS restricted to an explicit configured origin allow-list with no wildcard. In-process per-client token bucket keyed by client IP plus session token hash, applied to the upload endpoint and every endpoint that will reach an adapter or a provider, returning `RATE_LIMITED` with retry-after. Response headers `Strict-Transport-Security`, `X-Content-Type-Options`, `Referrer-Policy: no-referrer`. `.env.example` listing every required key with placeholder values.
   - Depends on: 4.1, 3.3
   - _Requirements: RM-SEC-002 c1, c3, c4, c5, c6_ · _Design: Security table_
   - Done when: a request from an unlisted origin receives no `Access-Control-Allow-Origin` header; exceeding the configured bucket returns 429 with code `RATE_LIMITED`; a test asserts every key read by `Settings` appears in `.env.example`; a test asserts no `Access-Control-Allow-Origin: *` is ever emitted.
 
-- [ ] 4.5 [P0] Implement `GET /api/v1/health`
+- [x] 4.5 [P0] Implement `GET /api/v1/health`
   - Files: `backend/src/resumematch/api/routers/meta.py`, `backend/tests/integration/test_health.py`
   - Work: report service status, loaded rubric count, and configured source count. Nothing else.
   - Depends on: 4.1
   - _Requirements: RM-OBS-001 c4_ · _Design: Observability_
   - Done when: the response body has exactly three keys; a test asserts the response contains no session, profile, or candidate-derived field.
 
-- [ ] 4.6 [P0] Implement `tools/export_schemas.py` and the schema-drift gate
+- [x] 4.6 [P0] Implement `tools/export_schemas.py` and the schema-drift gate
   - Files: `tools/export_schemas.py`, `docs/schemas/.gitkeep`, `web/src/lib/api/generated/`, `.github/workflows/ci.yml`
   - Work: export every Pydantic model marked for publication to JSON Schema under `docs/schemas/`, generate TypeScript types into `web/src/lib/api/generated/` from the published OpenAPI document, and add a CI step that re-runs generation and fails on any diff.
   - Depends on: 4.1, 1.4
@@ -254,35 +254,35 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 5. Test infrastructure and CI gates
 
-- [ ] 5.1 [P0] Create the test tree, markers, and Hypothesis profile
+- [x] 5.1 [P0] Create the test tree, markers, and Hypothesis profile
   - Files: `backend/tests/conftest.py`, `backend/pytest.ini`, `backend/tests/{unit,properties,integration,privacy,fabrication,perf,tools}/.gitkeep`
   - Work: register the `live`, `boundary`, and `perf` markers; exclude `live` from the default run; configure a Hypothesis profile with `derandomize=True`, `max_examples=100` minimum, `deadline=None`, and a committed `.hypothesis/` example database directory. Add the property-tag docstring convention (`# Feature: resumematch, Property N: <title>`).
   - Depends on: 1.1
   - _Requirements: RM-TEST-001 c1, c2, c3, c6_ · _Design: Testing Strategy — Layers and libraries; D-33_
   - Done when: `pytest -q` collects and passes with zero tests failing; `pytest -m live --collect-only` reports zero tests selected in the default configuration; the Hypothesis profile is active (assert `settings().derandomize is True` in a meta-test).
 
-- [ ] 5.2 [P0] Implement the network-blocking and counting-stub fixtures
+- [x] 5.2 [P0] Implement the network-blocking and counting-stub fixtures
   - Files: `backend/tests/conftest.py`, `backend/tests/privacy/conftest.py`
   - Work: a `no_network` fixture replacing `socket.socket.connect` with a raiser; a `CountingStubProvider` recording every invocation per operation; a `CapturingTelemetry` fixture recording every emitted log record, metric, and trace attribute for later marker assertions.
   - Depends on: 5.1, 3.6
   - _Requirements: RM-TEST-001 c6; RM-PRIV-003 c11; RM-OBS-002 c6_ · _Design: What the CI check inspects_
   - Done when: a smoke test using `no_network` asserts that any outbound connection attempt raises; a smoke test asserts `CountingStubProvider.invocations == 0` after construction and increments on call.
 
-- [ ] 5.3 [P0] Wire the CI pipeline with the six no-override gate jobs
+- [x] 5.3 [P0] Wire the CI pipeline with the six no-override gate jobs
   - Files: `.github/workflows/ci.yml`, `CODEOWNERS`
   - Work: jobs `lint`, `config-validate`, `schema-drift`, `unit`, `properties`, `frontend`, plus the six required gates `privacy`, `pii-gates`, `boundary`, `reqx-accuracy`, `fabrication`, `determinism`. No gate carries `continue-on-error`, a `skip` condition, or an environment-conditional bypass. Gates whose corpus does not exist yet run their available half and fail on absence of the corpus rather than passing vacuously. `CODEOWNERS` requires maintainer review for `.importlinter`, `tools/`, and `.github/workflows/`.
   - Depends on: 2.2, 2.4, 2.6, 2.7, 5.1
   - _Requirements: RM-TEST-001 c1, c8; RM-SEC-003 c2, c3_ · _Design: Build gates — no override path; CI pipeline shape_
   - Done when: `grep -c "continue-on-error" .github/workflows/ci.yml` returns 0; each of the six gate jobs is listed under branch-protection required checks in `docs/architecture.md`; the `boundary` job runs `lint-imports`, `tools/check_egress.py`, and `pytest -m boundary`; `CODEOWNERS` covers the three paths.
 
-- [ ] 5.4 [P0] Add the dependency and secret scanning job
+- [x] 5.4 [P0] Add the dependency and secret scanning job
   - Files: `.github/workflows/ci.yml`, `.gitleaks.toml`
   - Work: `pip-audit` and `npm audit` failing on high or critical severity; `gitleaks` secret scan failing on any finding.
   - Depends on: 5.3
   - _Requirements: RM-SEC-003 c1, c2; RM-SEC-002 c2_ · _Design: Security table_
   - Done when: the `deps` job runs all three tools; a test commit containing a synthetic AWS-shaped key fails the job and is not merged.
 
-- [ ] 5.5 [P0] Write `docs/privacy.md` — the reviewable seven-stage lifecycle statement
+- [x] 5.5 [P0] Write `docs/privacy.md` — the reviewable seven-stage lifecycle statement
   - Files: `docs/privacy.md`
   - Work: state each of the seven candidate-data lifecycle stages, where each lives, how long, and which code path owns it, in a form a reviewer can hold beside the source.
   - Depends on: 3.7
@@ -311,14 +311,14 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 7. PDF extraction reading order and offset fidelity
 
-- [ ] 7.1 [P0] Build the eleven-document resume fixture corpus
+- [x] 7.1 [P0] Build the eleven-document resume fixture corpus
   - Files: `fixtures/resumes/` (eleven documents), `fixtures/resumes/MANIFEST.md`
   - Work: author the eleven documents named by the requirements — single-column PDF, two-column PDF, table-based PDF, text-box PDF, multi-page PDF, DOCX, missing sections, duplicate headings, unusual section headings, malformed encoding, image-only PDF. Synthetic content only, no real third-party personal data. `MANIFEST.md` records, per document, what it is testing and its provenance.
   - Depends on: 1.3
   - _Requirements: RM-TEST-002 c1, c2_ · _Design: Repository layout — `fixtures/resumes/`_
   - Done when: eleven documents exist and are tracked; `MANIFEST.md` has one row per document naming the RM-TEST-002 c1 case it covers; a test asserts the corpus contains exactly one image-only PDF and at least one DOCX; a reviewer-facing note in `MANIFEST.md` states that every name, address, and employer is invented.
 
-- [ ] 7.2 [P0] [SPIKE] Measure `pdfplumber` reading order and offset fidelity across the corpus — time-box 1 day
+- [x] 7.2 [P0] [SPIKE] Measure `pdfplumber` reading order and offset fidelity across the corpus — time-box 1 day
   - Files: `docs/decisions/0001-pdf-extraction-library.md` (kept), throwaway script under `spikes/` (deleted at the end)
   - Work: run `pdfplumber` with the design's proposed column-clustering rule (words clustered by x-midpoint using a fixed gap threshold expressed as a fraction of page width, read column-by-column then top-to-bottom) against all eleven fixtures. For the two-column, table-based, and text-box documents, manually check reading order and verify that slicing the extracted text at each recorded block offset reproduces the block's text exactly. If reading order fails, evaluate `PyMuPDF` (recording the AGPL licensing question) and a direct word-box fallback.
   - Depends on: 7.1

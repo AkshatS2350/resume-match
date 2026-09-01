@@ -1,0 +1,20 @@
+services:
+  api:
+    build: ./backend
+    environment:
+      RESUMEMATCH_JOB_SOURCE: fixture
+      RESUMEMATCH_LLM_PROVIDER: ""
+      RESUMEMATCH_CORS_ORIGINS: http://localhost:3000
+      PYTHONHASHSEED: "0"
+    volumes:
+      - ./rubrics:/app/rubrics:ro
+      - ./ontology:/app/ontology:ro
+      - ./config:/app/config:ro
+      - ./fixtures:/app/fixtures:ro
+    ports: ["8000:8000"]
+  web:
+    build: ./web
+    environment:
+      NEXT_PUBLIC_API_BASE: http://localhost:8000/api/v1
+    ports: ["3000:3000"]
+    depends_on: [api]

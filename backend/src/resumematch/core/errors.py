@@ -82,3 +82,10 @@ for _code in ErrorCode:
     )
 
 del _code
+
+# Publicly named today; the remaining fail-closed types are introduced by their
+# owning pipeline tasks using the same closed-code mechanism above.
+SessionNotFoundError: type[PipelineError] = _error_type(
+    "SessionNotFoundError", ErrorCode.SESSION_NOT_FOUND
+)
+RateLimitedError: type[PipelineError] = _error_type("RateLimitedError", ErrorCode.RATE_LIMITED)

@@ -1,12 +1,17 @@
 """Application-startup safeguards for the single-worker deployment model."""
 
 import os
+from collections.abc import Awaitable, Callable
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, Response
 
 from resumematch.api.composition import build_components
+from resumematch.api.ratelimit import TokenBucketLimiter
+from resumematch.api.routers.meta import router as meta_router
+from resumematch.api.routers.sessions import router as sessions_router
 from resumematch.core.config import ConfigInvalid
 from resumematch.core.errors import (
     ErrorCode,
@@ -80,6 +85,26 @@ def create_app(*routers: APIRouter) -> FastAPI:
 
     application = FastAPI(openapi_url="/api/v1/openapi.json", docs_url=None, redoc_url=None)
     application.state.components = build_components()
+    configured_origins = os.getenv("RESUMEMATCH_CORS_ORIGINS", "").split(",")
+    origins = tuple(origin for origin in configured_origins if origin)
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["Content-Type", "X-Session-Token"],
+    )
+    application.state.rate_limiter = TokenBucketLimiter(capacity=60, refill_per_second=1.0)
+
+    @application.middleware("http")
+    async def security_headers(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        response = await call_next(request)
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
     for router in routers:
         application.include_router(router, prefix="/api/v1")
 
@@ -108,7 +133,11 @@ def create_app(*routers: APIRouter) -> FastAPI:
                 message=str(error),
                 stage=PipelineStage.ANY,
                 retryable=error.code
-                in {ErrorCode.EXTRACTION_TIMEOUT, ErrorCode.PII_DETECTION_UNAVAILABLE},
+                in {
+                    ErrorCode.EXTRACTION_TIMEOUT,
+                    ErrorCode.PII_DETECTION_UNAVAILABLE,
+                    ErrorCode.RATE_LIMITED,
+                },
                 context=error.context,
             ),
             _STATUS_BY_CODE[error.code],
@@ -128,4 +157,4 @@ def create_app(*routers: APIRouter) -> FastAPI:
     return application
 
 
-app = create_app()
+app = create_app(sessions_router, meta_router)
