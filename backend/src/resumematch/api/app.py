@@ -6,6 +6,7 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from resumematch.api.composition import build_components
 from resumematch.core.config import ConfigInvalid
 from resumematch.core.errors import (
     ErrorCode,
@@ -78,6 +79,7 @@ def create_app(*routers: APIRouter) -> FastAPI:
     """Create the versioned API shell; feature routers are added by their owning tasks."""
 
     application = FastAPI(openapi_url="/api/v1/openapi.json", docs_url=None, redoc_url=None)
+    application.state.components = build_components()
     for router in routers:
         application.include_router(router, prefix="/api/v1")
 

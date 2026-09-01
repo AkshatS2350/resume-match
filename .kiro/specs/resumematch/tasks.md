@@ -217,7 +217,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-API-001 c1, c2, c3, c4_ · _Design: API Boundaries_ · _Property: 45_
   - Done when: `GET /api/v1/openapi.json` returns a document whose every path begins `/api/v1`; posting a malformed body to any registered endpoint returns 422 with a non-empty `details` array and both `code` and `message`; a test asserts an unhandled exception renders as `ErrorResponse` and not as a stack trace.
 
-- [ ] 4.2 [P0] Implement `api/composition.py` — the composition root
+- [x] 4.2 [P0] Implement `api/composition.py` — the composition root
   - Files: `backend/src/resumematch/api/composition.py`, `backend/tests/unit/api/test_composition.py`
   - Work: the single place that constructs `SystemClock`, `SessionStore`, the config objects, and (later) the `EgressGrant`s and the `LLM_Provider`. Expose FastAPI dependencies that hand components their collaborators by constructor injection. No service locator, no `get_provider()` accessor, no string-keyed registry.
   - Depends on: 2.5, 3.2, 3.7
