@@ -2081,6 +2081,28 @@ class Session(BaseModel):
     consent: ConsentState
 ```
 
+**Temporary nominal session references (task-order compatibility):** Until the
+owning schema tasks are implemented, Task 3.7 may use one distinct, non-exported
+nominal marker type for each future Session-held concept. These markers contain no
+product logic or candidate-derived fields, are not FastAPI/OpenAPI contracts, and are
+replaced in place without changing the Session field semantics.
+
+| Temporary reference | Replaced by owning task |
+|---|---|
+| `ExtractedTextRef` | Task 9.1 |
+| `StructuredResumeRef` | Task 12.2 |
+| `CandidateProfileRef` | Task 12.2 |
+| `SanitizedResumeRef` | Task 17.4 |
+| `ManifestEntryRef` | Task 18.1 |
+| `PendingRequestRef` | Task 18.1 |
+| `ReadinessResultRef` | Task 42.1 |
+| `MatchResultSetRef` | Task 49.1 |
+| `ConsentStateRef` | Task 18.1 |
+
+`SanitizationRecord` is not temporary: Task 3.8 defines its complete concrete frozen
+model now. `write_sanitization_record` accepts only `Session`, `SanitizedResumeRef`,
+and `SanitizationRecord` and atomically updates the two write-restricted fields.
+
 Implementation: an `OrderedDict[str, Session]` guarded by a lock, with an opportunistic sweep on every access that evicts entries whose `last_access_at` is more than 24 hours behind `clock.now()` (RM-PRIV-001 c6), plus a bounded-capacity LRU eviction so an abandoned-session flood cannot exhaust memory. The token is `secrets.token_urlsafe(32)` — opaque, carrying no Candidate_Data (RM-SESS-001 c1). Only the token *hash* is stored on the Session and used in telemetry.
 
 **v1 is single-worker. Stated plainly (D-16).**
