@@ -187,14 +187,14 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-OBS-001 c1, c2, c3; RM-OBS-002 c1, c3, c4_ · _Design: Observability_ · _Property: 48_
   - Done when: `emit_metric("resume_text_total")` raises naming the offending metric; `emit_log(candidate_name="x")` raises naming the offending field; a test asserts a wrapped `ValueError("secret text")` logs `ValueError at extract [redacted]` and never the original message.
 
-- [ ] 3.7 [P0] Implement `core/session.py` — the Session model and TTL+LRU store
+- [x] 3.7 [P0] Implement `core/session.py` — the Session model and TTL+LRU store
   - Files: `backend/src/resumematch/core/session.py`, `backend/tests/unit/core/test_session.py`
   - Work: the `Session` model with every field from the design; use only the distinct temporary nominal session-reference types in the design's task-order compatibility table for schemas owned by later tasks. They are non-exported markers with no product logic or candidate-derived fields, and their owning task replaces them. `sanitized_resume` and `sanitization_record` are read-only properties with no public setter. `SessionStore` as a locked `OrderedDict` with an opportunistic sweep evicting entries whose `last_access_at` is more than the configured TTL behind `clock.now()`, plus bounded-capacity LRU eviction. Token via `secrets.token_urlsafe(32)`; only `token_hash` is stored on the Session.
   - Depends on: 3.2, 3.4
   - _Requirements: RM-SESS-001 c1, c2; RM-PRIV-001 c5, c6, c8_ · _Design: Session_Store; D-16_
   - Done when: a test with a `FixedClock` advanced past the TTL asserts the session is absent on next access; a test asserts `session.sanitized_resume = x` raises `AttributeError`; a test asserts the token value never appears on the `Session` object, only its hash; a test asserts `delete(token)` leaves no reference reachable from the store.
 
-- [ ] 3.8 [P0] Implement `core/session_write.py` — the sanitization-record write capability
+- [x] 3.8 [P0] Implement `core/session_write.py` — the sanitization-record write capability
   - Files: `backend/src/resumematch/core/session_write.py`, `backend/tests/privacy/test_session_write_restriction.py`
   - Work: the only module able to mutate `Session._sanitized_resume` and `Session._sanitization_record`, exposing `write_sanitization_record(session, resume, record)` typed as `Session`, `SanitizedResumeRef`, and concrete `SanitizationRecord`. Define `SanitizationRecord` (frozen: `content_hash`, `profile_revision`, `produced_at`, `pii_policy_version`, `detector_versions`, `placeholder_set_version`, `removed_categories`, `fail_safe_redaction_count`). The update of both fields is atomic.
   - Depends on: 3.7, 2.3
