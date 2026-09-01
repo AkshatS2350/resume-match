@@ -2533,6 +2533,7 @@ Consolidated taxonomy. Every code named anywhere in the requirements appears her
 | `SESSION_EXPIRED` | 410 | any | no | RM-PRIV-001 c6, RM-UI-003 c3 | Same |
 | `RATE_LIMITED` | 429 | upload, guidance, ingest | yes | RM-SEC-002 c3 | Show retry-after |
 | `CONFIG_INVALID` | — (startup) | boot | no | RM-SEC-002 c6, RM-RUB-002 c1, RM-CONF-001 c1, RM-MATCH-001 c2, RM-MATCH-003 c8 | Service fails to start, naming the key or file |
+| `INTERNAL_ERROR` | 500 | any | yes | Approved Task 4.1 amendment | A truly unhandled internal server failure not covered by a more specific closed code; return only a generic safe message |
 | `guidance_unavailable` | **200** | guidance | yes | RM-LLM-003 c2–c4, c6; RM-LLM-004 c4; RM-COACH-002 c7; RM-DEP-002 c2 | **Not an error response.** A state on a successful body |
 
 **`guidance_unavailable` is deliberately not in the error envelope.** RM-LLM-003 c4 and c5 require the deterministic results to be returned *with* a statement that written guidance is temporarily unavailable. Modelling it as an HTTP error would force the client to discard a successful payload. It is therefore a field on the guidance response:

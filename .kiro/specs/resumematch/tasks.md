@@ -175,7 +175,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 - [x] 3.5 [P0] Implement `core/errors.py` — the single error taxonomy
   - Files: `backend/src/resumematch/core/errors.py`, `backend/tests/unit/core/test_errors.py`
-  - Work: `ErrorCode` closed enum containing every code in the design's error table, `PipelineStage` enum, `ErrorDetail`, `ErrorResponse` (frozen, `extra="forbid"`, with `code`, `message`, `stage`, `details`, `retryable`, `context`), and one exception class per fail-closed path carrying its code. `guidance_unavailable` is deliberately **not** an `ErrorCode`.
+  - Work: `ErrorCode` closed enum containing every code in the design's error table, including `INTERNAL_ERROR` for truly unhandled failures, `PipelineStage` enum, `ErrorDetail`, `ErrorResponse` (frozen, `extra="forbid"`, with `code`, `message`, `stage`, `details`, `retryable`, `context`), and one exception class per fail-closed path carrying its code. `guidance_unavailable` is deliberately **not** an `ErrorCode`.
   - Depends on: 1.2
   - _Requirements: RM-API-001 c3; RM-PARSE-004 c5_ · _Design: One error taxonomy_ · _Property: 45_
   - Done when: a test asserts every code string in the design's error table is a member of `ErrorCode`; asserts `"guidance_unavailable"` is not a member; asserts `context` values are constrained to `str | int` so a candidate-derived object cannot be placed there.
@@ -210,7 +210,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 4. API skeleton and published contracts
 
-- [ ] 4.1 [P0] Implement the FastAPI application, versioned prefix, and OpenAPI publication
+- [x] 4.1 [P0] Implement the FastAPI application, versioned prefix, and OpenAPI publication
   - Files: `backend/src/resumematch/api/app.py`, `backend/src/resumematch/api/routers/__init__.py`, `backend/src/resumematch/api/dto/__init__.py`
   - Work: mount all routers under `/api/v1`; publish the OpenAPI document at `/api/v1/openapi.json`; install a global exception handler that renders every failure as `ErrorResponse` and every validation failure as HTTP 422 with a field-level `details` list.
   - Depends on: 3.5, 3.9

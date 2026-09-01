@@ -14,6 +14,7 @@ def test_taxonomy_contains_every_error_code_from_the_design_table() -> None:
         "SANITIZATION_HASH_MISMATCH", "PROJECTION_PATH_UNKNOWN", "PII_DETECTION_UNAVAILABLE",
         "RUBRIC_UNAVAILABLE", "SCORING_FAILED", "MATCHING_FAILED", "SESSION_NOT_FOUND",
         "SESSION_EXPIRED", "RATE_LIMITED", "CONFIG_INVALID",
+        "INTERNAL_ERROR",
     }
 
     assert expected_codes == {code.value for code in ErrorCode}

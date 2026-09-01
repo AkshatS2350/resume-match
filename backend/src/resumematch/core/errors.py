@@ -30,6 +30,7 @@ class ErrorCode(str, Enum):
     SESSION_EXPIRED = "SESSION_EXPIRED"
     RATE_LIMITED = "RATE_LIMITED"
     CONFIG_INVALID = "CONFIG_INVALID"
+    INTERNAL_ERROR = "INTERNAL_ERROR"
 
 
 class PipelineStage(str, Enum):
