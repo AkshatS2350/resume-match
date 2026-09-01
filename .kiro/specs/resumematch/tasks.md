@@ -201,7 +201,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-PRIV-003 c6_ · _Design: Sanitization record and the write capability; D-08, D-09_
   - Done when: `lint-imports` exits 0; `tools/check_session_write_boundary.py` exits non-zero for a temporary import of `core.session_write` from `resumematch/coach/__init__.py` and reports the file, line, and `session_write_boundary` rule; the runtime/unit test asserts only the Sanitizer uses the capability and that writing sets both fields atomically.
 
-- [ ] 3.9 [P0] Implement the single-worker startup guard
+- [x] 3.9 [P0] Implement the single-worker startup guard
   - Files: `backend/src/resumematch/api/app.py`, `backend/tests/unit/api/test_worker_guard.py`
   - Work: at startup read `WEB_CONCURRENCY`, `UVICORN_WORKERS`, and the Gunicorn worker count; if any exceeds 1, refuse to start with a named error in the style of a missing required configuration key.
   - Depends on: 3.3
