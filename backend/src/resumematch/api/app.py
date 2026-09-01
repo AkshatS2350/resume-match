@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse, Response
 from resumematch.api.composition import build_components
 from resumematch.api.ratelimit import TokenBucketLimiter
 from resumematch.api.routers.meta import router as meta_router
+from resumematch.api.routers.resume import router as resume_router
 from resumematch.api.routers.sessions import router as sessions_router
 from resumematch.core.config import ConfigInvalid
 from resumematch.core.errors import (
@@ -105,6 +106,7 @@ def create_app(*routers: APIRouter) -> FastAPI:
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "no-referrer"
         return response
+
     for router in routers:
         application.include_router(router, prefix="/api/v1")
 
@@ -154,7 +156,8 @@ def create_app(*routers: APIRouter) -> FastAPI:
             ),
             500,
         )
+
     return application
 
 
-app = create_app(sessions_router, meta_router)
+app = create_app(sessions_router, resume_router, meta_router)

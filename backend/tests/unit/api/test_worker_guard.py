@@ -4,9 +4,7 @@ from resumematch.api.app import ensure_single_worker
 from resumematch.core.config import ConfigInvalid
 
 
-@pytest.mark.parametrize(
-    "variable", ["WEB_CONCURRENCY", "UVICORN_WORKERS", "GUNICORN_WORKERS"]
-)
+@pytest.mark.parametrize("variable", ["WEB_CONCURRENCY", "UVICORN_WORKERS", "GUNICORN_WORKERS"])
 def test_rejects_multiple_workers(monkeypatch: pytest.MonkeyPatch, variable: str) -> None:
     monkeypatch.setenv(variable, "2")
 

@@ -16,9 +16,7 @@ def test_expired_session_is_absent_on_access() -> None:
 
 
 def test_sanitized_resume_has_no_public_setter() -> None:
-    store = SessionStore(
-        FixedClock(datetime(2026, 9, 1, tzinfo=UTC)), timedelta(hours=1), 2
-    )
+    store = SessionStore(FixedClock(datetime(2026, 9, 1, tzinfo=UTC)), timedelta(hours=1), 2)
     session = store.get(store.create())
     assert session is not None
     with pytest.raises(AttributeError):
@@ -26,18 +24,14 @@ def test_sanitized_resume_has_no_public_setter() -> None:
 
 
 def test_delete_removes_session() -> None:
-    store = SessionStore(
-        FixedClock(datetime(2026, 9, 1, tzinfo=UTC)), timedelta(hours=1), 2
-    )
+    store = SessionStore(FixedClock(datetime(2026, 9, 1, tzinfo=UTC)), timedelta(hours=1), 2)
     token = store.create()
     store.delete(token)
     assert store.get(token) is None
 
 
 def test_session_retains_only_a_hash_of_its_opaque_token() -> None:
-    store = SessionStore(
-        FixedClock(datetime(2026, 9, 1, tzinfo=UTC)), timedelta(hours=1), 2
-    )
+    store = SessionStore(FixedClock(datetime(2026, 9, 1, tzinfo=UTC)), timedelta(hours=1), 2)
     token = store.create()
     session = store.get(token)
 

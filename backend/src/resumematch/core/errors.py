@@ -89,3 +89,24 @@ SessionNotFoundError: type[PipelineError] = _error_type(
     "SessionNotFoundError", ErrorCode.SESSION_NOT_FOUND
 )
 RateLimitedError: type[PipelineError] = _error_type("RateLimitedError", ErrorCode.RATE_LIMITED)
+FileTooLargeError: type[PipelineError] = _error_type("FileTooLargeError", ErrorCode.FILE_TOO_LARGE)
+TooManyPagesError: type[PipelineError] = _error_type("TooManyPagesError", ErrorCode.TOO_MANY_PAGES)
+UnsupportedFormatError: type[PipelineError] = _error_type(
+    "UnsupportedFormatError", ErrorCode.UNSUPPORTED_FORMAT
+)
+ScannedPdfUnsupportedError: type[PipelineError] = _error_type(
+    "ScannedPdfUnsupportedError", ErrorCode.SCANNED_PDF_UNSUPPORTED
+)
+ScannedPdfPartialError: type[PipelineError] = _error_type(
+    "ScannedPdfPartialError", ErrorCode.SCANNED_PDF_PARTIAL
+)
+EmptyFileError: type[PipelineError] = _error_type("EmptyFileError", ErrorCode.EMPTY_FILE)
+ExtractionInsufficientTextError: type[PipelineError] = _error_type(
+    "ExtractionInsufficientTextError", ErrorCode.EXTRACTION_INSUFFICIENT_TEXT
+)
+ExtractionFailedError: type[PipelineError] = _error_type(
+    "ExtractionFailedError", ErrorCode.EXTRACTION_FAILED
+)
+ExtractionTimeoutError: type[PipelineError] = _error_type(
+    "ExtractionTimeoutError", ErrorCode.EXTRACTION_TIMEOUT
+)

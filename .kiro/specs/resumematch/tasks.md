@@ -331,35 +331,35 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 8. Upload validation and hardening
 
-- [ ] 8.1 [P0] Implement streaming upload with the size ceiling enforced before the body is read
+- [x] 8.1 [P0] Implement streaming upload with the size ceiling enforced before the body is read
   - Files: `backend/src/resumematch/resume/upload.py`, `backend/src/resumematch/api/routers/resume.py`, `backend/src/resumematch/api/dto/resume.py`, `backend/tests/integration/test_upload_size.py`
   - Work: reject on `Content-Length` above 10 MB with 413 `FILE_TOO_LARGE` without draining the body; otherwise stream to an OS temp file at `{tmpdir}/{uuid4().hex}` with mode `0o600`, aborting at 10 MB. The upload DTO has **no** `filename` field. Reject zero bytes with `EMPTY_FILE`.
   - Depends on: 4.1, 4.4, 3.5
   - _Requirements: RM-ING-001 c4, c6, c8; RM-SEC-001 c1, c5; RM-PRIV-001 c4_ · _Design: Upload_Service validation order_
   - Done when: an 11 MB upload returns 413 `FILE_TOO_LARGE` and the test asserts the request body was not fully consumed; a zero-byte upload returns `EMPTY_FILE`; a test asserts the temp file mode is `0o600` and its name matches `^[0-9a-f]{32}$`; a test asserts the DTO model has no field named `filename` and that a client-supplied filename appears in no response body.
 
-- [ ] 8.2 [P0] Implement magic-byte content-type detection and format rejection
+- [x] 8.2 [P0] Implement magic-byte content-type detection and format rejection
   - Files: `backend/src/resumematch/resume/upload.py`, `backend/tests/unit/resume/test_content_type.py`
   - Work: determine the type from magic bytes — `%PDF-` for PDF, `PK\x03\x04` plus a `[Content_Types].xml` zip entry for DOCX — never from the filename extension. Anything else returns 415 `UNSUPPORTED_FORMAT`.
   - Depends on: 8.1
   - _Requirements: RM-ING-001 c1, c2, c3_ · _Design: Upload_Service validation order, step 4_
   - Done when: a PNG renamed to `.pdf` returns 415 `UNSUPPORTED_FORMAT`; a valid PDF named `resume.txt` is accepted; a zip without `[Content_Types].xml` returns 415.
 
-- [ ] 8.3 [P0] Implement the decompression-size probe and the page-count ceiling
+- [x] 8.3 [P0] Implement the decompression-size probe and the page-count ceiling
   - Files: `backend/src/resumematch/resume/upload.py`, `fixtures/resumes/adversarial/`, `backend/tests/unit/resume/test_bomb_and_pages.py`
   - Work: before extraction, sum DOCX zip entry uncompressed sizes and PDF stream lengths and reject above a configured ceiling with `FILE_TOO_LARGE`. Reject PDFs above 15 pages with `TOO_MANY_PAGES`. Add two adversarial fixtures: a compression bomb and a 16-page PDF.
   - Depends on: 8.2
   - _Requirements: RM-ING-001 c5; RM-SEC-001 c4_ · _Design: Upload_Service validation order, steps 5 and 6; Security table_
   - Done when: the bomb fixture returns `FILE_TOO_LARGE` and the test asserts peak process memory stays under the configured ceiling; the 16-page fixture returns `TOO_MANY_PAGES`; a 15-page fixture is accepted.
 
-- [ ] 8.4 [P0] Implement the extraction watchdog and the guaranteed temp-file cleanup
+- [x] 8.4 [P0] Implement the extraction watchdog and the guaranteed temp-file cleanup
   - Files: `backend/src/resumematch/resume/upload.py`, `backend/tests/unit/resume/test_watchdog_and_cleanup.py`
   - Work: run extraction under a configured wall-clock limit, returning 504 `EXTRACTION_TIMEOUT` on overrun. Wrap the whole temp-file lifetime in `try/finally` whose `finally` unlinks on success, on error, and on timeout. Release every reference to the uploaded bytes before the response is returned.
   - Depends on: 8.3
   - _Requirements: RM-SEC-001 c3; RM-PRIV-001 c2, c3, c4_ · _Design: Upload_Service validation order, step 7_
   - Done when: a test injecting a sleeping extractor returns `EXTRACTION_TIMEOUT` and asserts the temp path does not exist afterwards; a test injecting a raising extractor asserts the same; a test asserts the temp directory is empty after a successful upload; a test asserts `session.extracted_text` is set while no attribute anywhere on the Session holds raw bytes.
 
-- [ ] 8.5 [P0] Harden the parser configuration against hostile documents
+- [x] 8.5 [P0] Harden the parser configuration against hostile documents
   - Files: `backend/src/resumematch/resume/extract/hardening.py`, `backend/tests/unit/resume/test_parser_hardening.py`
   - Work: configure `pdfplumber`/`pdfminer.six` with no external resource resolution; read DOCX zip entries without following relationship targets; parse all XML through `defusedxml` with DTDs, entity expansion, and external entities disabled.
   - Depends on: 8.2
@@ -368,56 +368,56 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 9. Text extraction
 
-- [ ] 9.1 [P0] Define the `ExtractedText` and `ExtractedBlock` schemas
+- [x] 9.1 [P0] Define the `ExtractedText` and `ExtractedBlock` schemas
   - Files: `backend/src/resumematch/core/schemas/extracted_text.py`, `backend/tests/properties/test_extracted_text_schema.py`
   - Work: `ExtractedBlock` (frozen: `block_id` as `f"{page}:{ordinal}"`, `section_id`, `page`, `start_offset`, exclusive `end_offset`, `text`, `layout_kind`, `column_index`) and `ExtractedText` (frozen: `text`, `blocks`, `page_count`, `pages_with_text_layer`, `extractor_version`).
   - Depends on: 3.4
   - _Requirements: RM-PARSE-001 c2_ · _Design: Text_Extractor_ · _Property: 2_
   - Done when: both models are `frozen=True, extra="forbid"`; a Hypothesis round-trip test asserts `ExtractedText.model_validate(json.loads(x.model_dump_json())) == x`; a validator rejects a block whose `end_offset <= start_offset`.
 
-- [ ] 9.2 [P0] Implement the canonical text normalization pipeline
+- [x] 9.2 [P0] Implement the canonical text normalization pipeline
   - Files: `backend/src/resumematch/resume/extract/normalize.py`, `backend/tests/properties/test_normalization.py`, `docs/scoring.md`
   - Work: apply, in the design's fixed order, NFKC, the fixed ligature expansion table, the five space-like code points to `U+0020`, `U+2010`–`U+2015` to `-`, curly quotes to straight, CRLF/CR to LF, collapse runs of two or more spaces to one, strip trailing spaces per line, collapse runs of three or more newlines to two. Document the order in `docs/scoring.md`.
   - Depends on: 1.2
   - _Requirements: RM-PARSE-001 c7_ · _Design: Canonical normalization form_ · _Property: 5_
   - Done when: a Hypothesis test asserts `normalize(normalize(s)) == normalize(s)` for all generated strings; a test asserts the output contains no character from the prohibited set (non-breaking spaces, the six ligatures, `\r`, two consecutive spaces); `docs/scoring.md` lists the steps in the implemented order.
 
-- [ ] 9.3 [P0] Implement PDF extraction with fixed-threshold column clustering
+- [x] 9.3 [P0] Implement PDF extraction with fixed-threshold column clustering
   - Files: `backend/src/resumematch/resume/extract/pdf.py`, `backend/tests/unit/resume/test_pdf_extract.py`, `backend/tests/properties/test_provenance_offsets.py`
   - Work: implement the extractor using the library and the exact column-gap threshold recorded by task 7.2. Cluster word boxes into columns by x-midpoint, read column-by-column then top-to-bottom, emit `ExtractedBlock`s with `layout_kind` and `column_index`, then normalize. Thresholds are constants read from configuration, never tuned per document.
   - Depends on: 7.2, 9.1, 9.2, 8.5
   - _Requirements: RM-PARSE-001 c1, c2, c3, c6_ · _Design: Text_Extractor; D-36_ · _Property: 1, 4_
   - Done when: extraction over all ten text-bearing fixtures produces, for every block, `extracted.text[b.start_offset:b.end_offset] == b.text`; extracting each fixture twice produces byte-identical `model_dump_json()`; the two-column fixture's block order matches the expected order recorded in `fixtures/baselines/reading_order/`.
 
-- [ ] 9.4 [P0] Implement DOCX extraction
+- [x] 9.4 [P0] Implement DOCX extraction
   - Files: `backend/src/resumematch/resume/extract/docx.py`, `backend/tests/unit/resume/test_docx_extract.py`
   - Work: extract paragraphs, table cells, and text boxes via `python-docx`, assigning `layout_kind` accordingly, then normalize. Same `ExtractedText` contract as the PDF path.
   - Depends on: 9.1, 9.2, 8.5
   - _Requirements: RM-PARSE-001 c1, c2, c3, c6_ · _Design: Text_Extractor; D-36_ · _Property: 1, 4_
   - Done when: the DOCX fixture yields blocks whose offsets all satisfy the slice-reproduces-text assertion; repeated extraction is byte-identical; table content appears with `layout_kind == "table_cell"`.
 
-- [ ] 9.5 [P0] Implement image-only and partially-image-only PDF detection
+- [x] 9.5 [P0] Implement image-only and partially-image-only PDF detection
   - Files: `backend/src/resumematch/resume/extract/text_layer.py`, `backend/src/resumematch/api/routers/resume.py`, `backend/tests/unit/resume/test_scanned_detection.py`
   - Work: a page has a text layer when the extractor yields at least 10 non-whitespace characters for it. Zero such pages returns `SCANNED_PDF_UNSUPPORTED`; fewer than half returns `SCANNED_PDF_PARTIAL` with the affected page list in `ErrorResponse.context`. Both stop the pipeline with an early `return` in the router, before the Structurer is constructed — not with a flag the Structurer is trusted to honour.
   - Depends on: 9.3
   - _Requirements: RM-PARSE-002 c1, c2, c3, c5_ · _Design: Scanned-PDF detection_
   - Done when: the image-only fixture returns `SCANNED_PDF_UNSUPPORTED`; a mixed fixture returns `SCANNED_PDF_PARTIAL` with the correct page numbers in `context`; a test asserts the Structurer records zero invocations on both paths; a test asserts no `Structured_Resume` field is present in either response.
 
-- [ ] 9.6 [P0] Implement the insufficient-text and unhandled-error extraction failures
+- [x] 9.6 [P0] Implement the insufficient-text and unhandled-error extraction failures
   - Files: `backend/src/resumematch/resume/extract/__init__.py`, `backend/tests/unit/resume/test_extraction_failures.py`
   - Work: fewer than 200 characters from a document of one or more pages returns `EXTRACTION_INSUFFICIENT_TEXT`. An unhandled library error returns `EXTRACTION_FAILED` with a user-facing message naming the file type and suggesting re-export as a text-based PDF.
   - Depends on: 9.3, 9.4
   - _Requirements: RM-PARSE-001 c4, c5_ · _Design: Error Handling table_
   - Done when: a 150-character fixture returns `EXTRACTION_INSUFFICIENT_TEXT`; a test injecting a library exception returns `EXTRACTION_FAILED` whose `message` contains the file type token and the re-export suggestion, and contains no candidate-derived text.
 
-- [ ] 9.7 [P0] Implement the extraction endpoint and its stage response
+- [x] 9.7 [P0] Implement the extraction endpoint and its stage response
   - Files: `backend/src/resumematch/api/routers/resume.py`, `backend/src/resumematch/api/dto/resume.py`, `backend/tests/integration/test_resume_upload_endpoint.py`
   - Work: `POST /api/v1/sessions/resume` (session in the `X-Session-Token` header) validating, extracting, storing `ExtractedText` in Session state, and returning `extraction_ok`, `page_count`, and warnings. The response never contains `ExtractedText`.
   - Depends on: 8.4, 9.3, 9.4, 9.5, 9.6, 4.3
   - _Requirements: RM-ING-001 c1–c8; RM-PARSE-001; RM-PARSE-002; RM-PRIV-001 c5_ · _Design: API Boundaries; D-11_
   - Done when: an integration test uploads each of the ten text-bearing fixtures and receives 200 with a `page_count`; a test asserts the response body contains no field carrying extracted text; a test asserts `ExtractedText` is retrievable from the Session afterwards.
 
-- [ ] 9.8 [P0] Add the upload-format and size disclosure to the client
+- [x] 9.8 [P0] Add the upload-format and size disclosure to the client
   - Files: `web/src/components/UploadPanel.tsx`, `web/tests/UploadPanel.test.tsx`
   - Work: display the two accepted formats and the 10 MB maximum **before** the user selects a file. Render the scan/OCR message for `SCANNED_PDF_UNSUPPORTED` and `SCANNED_PDF_PARTIAL`, stating that the file appears to be a scan or image, that OCR is not supported, and that a text-based PDF or DOCX is required.
   - Depends on: 1.4, 9.7

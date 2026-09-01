@@ -1,0 +1,12 @@
+Avery Rowan - Synthetic Resume
+17 Example Lane, Testville · avery.rowan@example.test
+Two Column Layout
+Skills
+Python
+SQL
+Data visualisation
+Experience
+Analyst, Northwind Testing Works
+Created test-only reporting examples.
+Education
+Example State University

@@ -19,8 +19,7 @@ def _normalize(value: Any) -> Any:
         return [_normalize(item) for item in value]
     if isinstance(value, dict):
         return {
-            unicodedata.normalize("NFC", str(key)): _normalize(item)
-            for key, item in value.items()
+            unicodedata.normalize("NFC", str(key)): _normalize(item) for key, item in value.items()
         }
     raise TypeError(f"unsupported canonical JSON value: {type(value).__name__}")
 
