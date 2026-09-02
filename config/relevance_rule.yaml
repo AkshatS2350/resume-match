@@ -1,0 +1,4 @@
+version: relevance_rule@all_dated_v1
+rule: all_dated
+min_span_months: 1
+present_resolves_to: session_start_date

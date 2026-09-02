@@ -40,6 +40,8 @@ ignore_imports =
     resumematch.job.adapters.* -> *
     resumematch.core.egress -> httpx
     resumematch.core.egress -> socket
+    resumematch.llm.gateway -> resumematch.llm.provider_api
+    resumematch.api.composition -> resumematch.llm.provider_api
 unmatched_ignore_imports_alerting = none
 
 [importlinter:contract:provider_api]

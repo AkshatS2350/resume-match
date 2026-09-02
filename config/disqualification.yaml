@@ -1,0 +1,4 @@
+version: disqualification@1
+unmet_required_threshold: 2
+seniority_tolerance_years: 2
+excluded_requirement_categories: [work_authorization, visa_status, sponsorship, security_clearance_citizenship]

@@ -1,0 +1,28 @@
+version: pii_policy@1
+minimum_classification_confidence: "0.80"
+categories:
+  person_name: { default: Remove }
+  email: { default: Remove }
+  telephone: { default: Remove }
+  postal_address: { default: Remove }
+  profile_url: { default: Remove }
+  personal_website: { default: Remove }
+  social_handle: { default: Remove }
+  government_identifier: { default: Remove }
+  student_employee_identifier: { default: Remove }
+  date_of_birth: { default: Remove }
+  named_reference: { default: Remove }
+retain_field_paths:
+  - /resume/experience/*/employer
+  - /resume/education/*/institution
+  - /resume/certifications/*/name
+  - /resume/certifications/*/issuer
+  - /resume/experience/*/title
+  - /resume/skills/*/surface
+  - /resume/skills/*/canonical_skill_id
+  - /resume/projects/*/description
+  - /resume/experience/*/description
+  - /resume/experience/*/start_date
+  - /resume/experience/*/end_date
+  - /resume/education/*/degree_level
+  - /resume/education/*/field_of_study

@@ -1,0 +1,26 @@
+Candidate resume fixture: name-recall
+Name: Alice Carter
+Name: Brian Foster
+Name: Carla Gibson
+Name: David Harris
+Name: Elena Jacobs
+Name: Frank Keller
+Name: Grace Martin
+Name: Henry Nelson
+Name: Irene Powell
+Name: James Parker
+Name: Karen Turner
+Name: Megan Rivers
+Name: Olivia Stone
+Name: Peter Howard
+Name: Quinn Miller
+Name: Sarah Morgan
+Name: Tessa Brooks
+Name: Victor Allen
+Name: Willow Hayes
+Name: Xavier Young
+Employer: Morgan Stanley
+Employer: Ernst & Young
+Education: Johns Hopkins
+Project: Collaborated with Alice Carter on deterministic tooling.
+Near miss: Alice123 is an internal fixture identifier, not a person name.

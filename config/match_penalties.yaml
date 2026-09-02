@@ -1,0 +1,3 @@
+version: match_penalties@1
+absent_preferred_requirement: "5"
+absent_hard_requirement: "15"

@@ -9,6 +9,8 @@ def test_composition_constructs_core_collaborators_without_module_singletons() -
     assert is_dataclass(components)
     assert components.session_store is not None
     assert components.clock is not None
+    assert components.llm_grant.allowed_hosts == frozenset()
+    assert components.job_source_grant.allowed_hosts == frozenset()
     assert not any(
         not name.startswith("_")
         and not callable(value)

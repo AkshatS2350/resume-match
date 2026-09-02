@@ -1,0 +1,13 @@
+{
+  "date_of_birth": 1.0,
+  "email": 1.0,
+  "government_identifier": 1.0,
+  "named_reference": 1.0,
+  "person_name": 1.0,
+  "personal_website": 1.0,
+  "postal_address": 1.0,
+  "profile_url": 1.0,
+  "social_handle": 1.0,
+  "student_employee_identifier": 1.0,
+  "telephone": 1.0
+}

@@ -1,0 +1,9 @@
+version: match_weights@1
+weights:
+  skills: "30"
+  experience: "20"
+  role_similarity: "15"
+  seniority: "10"
+  education: "10"
+  location_workmode: "10"
+  domain_signals: "5"

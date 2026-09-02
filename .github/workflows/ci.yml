@@ -49,6 +49,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - run: uv run --project backend pytest backend/tests/privacy
+      - run: uv run --project backend python tools/check_prohibited_claims.py
   pii-gates:
     runs-on: ubuntu-latest
     steps:

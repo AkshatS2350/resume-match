@@ -57,7 +57,8 @@ class HttpEgress(Protocol):
 
 
 class EgressSettings(Protocol):
-    egress_timeout_s: float
+    @property
+    def egress_timeout_s(self) -> float: ...
 
     def allowed_hosts_for(self, enclave: EgressEnclave) -> frozenset[str]: ...
 

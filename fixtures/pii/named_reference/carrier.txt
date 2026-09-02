@@ -1,0 +1,22 @@
+Synthetic named reference corpus
+Reference01 Person, person01@example.test, +44 7700 900001
+Reference02 Person, person02@example.test, +44 7700 900002
+Reference03 Person, person03@example.test, +44 7700 900003
+Reference04 Person, person04@example.test, +44 7700 900004
+Reference05 Person, person05@example.test, +44 7700 900005
+Reference06 Person, person06@example.test, +44 7700 900006
+Reference07 Person, person07@example.test, +44 7700 900007
+Reference08 Person, person08@example.test, +44 7700 900008
+Reference09 Person, person09@example.test, +44 7700 900009
+Reference10 Person, person10@example.test, +44 7700 900010
+Reference11 Person, person11@example.test, +44 7700 900011
+Reference12 Person, person12@example.test, +44 7700 900012
+Reference13 Person, person13@example.test, +44 7700 900013
+Reference14 Person, person14@example.test, +44 7700 900014
+Reference15 Person, person15@example.test, +44 7700 900015
+Reference16 Person, person16@example.test, +44 7700 900016
+Reference17 Person, person17@example.test, +44 7700 900017
+Reference18 Person, person18@example.test, +44 7700 900018
+Reference19 Person, person19@example.test, +44 7700 900019
+Reference20 Person, person20@example.test, +44 7700 900020
+Near miss: Reference Person has no contact details.

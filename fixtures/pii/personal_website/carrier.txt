@@ -1,0 +1,22 @@
+Synthetic personal website corpus
+https://portfolio01.example.test
+https://portfolio02.example.test
+https://portfolio03.example.test
+https://portfolio04.example.test
+https://portfolio05.example.test
+https://portfolio06.example.test
+https://portfolio07.example.test
+https://portfolio08.example.test
+https://portfolio09.example.test
+https://portfolio10.example.test
+https://portfolio11.example.test
+https://portfolio12.example.test
+https://portfolio13.example.test
+https://portfolio14.example.test
+https://portfolio15.example.test
+https://portfolio16.example.test
+https://portfolio17.example.test
+https://portfolio18.example.test
+https://portfolio19.example.test
+https://portfolio20.example.test
+Near miss: portfolio.example.test lacks a URL scheme.

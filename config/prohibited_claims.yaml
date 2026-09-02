@@ -1,0 +1,8 @@
+version: prohibited_claims@1
+claims:
+  - never leaves your device
+  - never leaves the device
+  - anonymous
+  - anonymity
+  - guaranteed de-identification
+  - no data touches disk

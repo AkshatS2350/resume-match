@@ -1,0 +1,21 @@
+version: confidence_weights@1
+term_order: [mean_extraction_confidence, profile_completeness, signal_coverage, job_description_completeness]
+readiness_weights:
+  mean_extraction_confidence: "0.30"
+  profile_completeness: "0.25"
+  signal_coverage: "0.45"
+match_weights:
+  mean_extraction_confidence: "0.25"
+  profile_completeness: "0.20"
+  signal_coverage: "0.35"
+  job_description_completeness: "0.20"
+bands: {low_medium: "0.50", medium_high: "0.75"}
+profile_sections: [skills, experience, education, projects, certifications, achievements]
+dimension_field_mapping:
+  skills: [required_skills, preferred_skills]
+  experience: [min_experience_years]
+  role_similarity: [role_family, normalized_title]
+  seniority: [seniority]
+  education: [education_requirements]
+  location_workmode: [normalized_location, work_mode]
+  domain_signals: [company, role_family]

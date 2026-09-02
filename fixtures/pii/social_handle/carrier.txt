@@ -1,0 +1,22 @@
+Synthetic social handle corpus
+@candidate_01
+@candidate_02
+@candidate_03
+@candidate_04
+@candidate_05
+@candidate_06
+@candidate_07
+@candidate_08
+@candidate_09
+@candidate_10
+@candidate_11
+@candidate_12
+@candidate_13
+@candidate_14
+@candidate_15
+@candidate_16
+@candidate_17
+@candidate_18
+@candidate_19
+@candidate_20
+Near miss: candidate_01 without at-sign is not a handle.

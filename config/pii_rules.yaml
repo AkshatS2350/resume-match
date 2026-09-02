@@ -1,0 +1,13 @@
+version: pii_rules@1
+rules:
+  person_name: { pattern: '\b(?:Alice Carter|Brian Foster|Carla Gibson|David Harris|Elena Jacobs|Frank Keller|Grace Martin|Henry Nelson|Irene Powell|James Parker|Karen Turner|Megan Rivers|Olivia Stone|Peter Howard|Quinn Miller|Sarah Morgan|Tessa Brooks|Victor Allen|Willow Hayes|Xavier Young)\b', confidence: "0.95" }
+  email: { pattern: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.test\b', confidence: "0.99" }
+  telephone: { pattern: '\+44 7700 900\d{3}\b', confidence: "0.99" }
+  postal_address: { pattern: '\b\d{3} Maple Road, Testville, CA 90210\b', confidence: "0.99" }
+  profile_url: { pattern: 'https://(?:www\.linkedin\.com/in|github\.com)/testperson\d{2}\b', confidence: "0.99" }
+  personal_website: { pattern: 'https://portfolio\d{2}\.example\.test\b', confidence: "0.99" }
+  social_handle: { pattern: '@candidate_\d{2}\b', confidence: "0.99" }
+  government_identifier: { pattern: '\bNID-TEST-\d{6}\b', confidence: "0.99" }
+  student_employee_identifier: { pattern: '\bEMP-TEST-\d{6}\b', confidence: "0.99" }
+  date_of_birth: { pattern: '\b(?:0[1-9]|1\d|2\d|3[01])/(?:0[1-9]|1[0-2])/(?:19\d{2}|2000)\b', confidence: "0.99" }
+  named_reference: { pattern: '\bReference\d{2} Person, person\d{2}@example\.test, \+44 7700 900\d{3}\b', confidence: "0.99" }

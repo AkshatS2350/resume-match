@@ -1,0 +1,22 @@
+Synthetic profile URL corpus
+https://www.linkedin.com/in/testperson01
+https://www.linkedin.com/in/testperson02
+https://www.linkedin.com/in/testperson03
+https://www.linkedin.com/in/testperson04
+https://www.linkedin.com/in/testperson05
+https://www.linkedin.com/in/testperson06
+https://www.linkedin.com/in/testperson07
+https://www.linkedin.com/in/testperson08
+https://www.linkedin.com/in/testperson09
+https://www.linkedin.com/in/testperson10
+https://github.com/testperson11
+https://github.com/testperson12
+https://github.com/testperson13
+https://github.com/testperson14
+https://github.com/testperson15
+https://github.com/testperson16
+https://github.com/testperson17
+https://github.com/testperson18
+https://github.com/testperson19
+https://github.com/testperson20
+Near miss: github.com is a host name, not a profile URL.

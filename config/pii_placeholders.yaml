@@ -1,0 +1,13 @@
+version: pii_placeholders@1
+tokens:
+  person_name: "[[PERSON_NAME]]"
+  email: "[[EMAIL]]"
+  telephone: "[[TELEPHONE]]"
+  postal_address: "[[POSTAL_ADDRESS]]"
+  profile_url: "[[PROFILE_URL]]"
+  personal_website: "[[PERSONAL_WEBSITE]]"
+  social_handle: "[[SOCIAL_HANDLE]]"
+  government_identifier: "[[GOVERNMENT_IDENTIFIER]]"
+  student_employee_identifier: "[[STUDENT_EMPLOYEE_IDENTIFIER]]"
+  date_of_birth: "[[DATE_OF_BIRTH]]"
+  named_reference: "[[NAMED_REFERENCE]]"

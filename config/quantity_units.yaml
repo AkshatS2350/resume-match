@@ -1,0 +1,10 @@
+version: units@1
+percent_tokens: ["%", pct, percent, percentage, pp, bps]
+currency_symbols: ["$", "€", "£", "¥", "₹", "R$", "C$", "A$"]
+currency_codes: [USD, EUR, GBP, INR, JPY, CAD, AUD, BRL, CNY, CHF, SEK, SGD]
+magnitude: [k, K, M, MM, B, bn, mn]
+time: [ms, s, sec, secs, min, mins, hr, hrs, h, day, days, week, weeks, month, months, yr, yrs, year, years, quarter, quarters]
+throughput: [QPS, RPS, TPS, "req/s", "reqs/s", "ops/s", IOPS, MIPS]
+data: [B, KB, MB, GB, TB, PB, LOC, SLOC, bps, kbps, Mbps, Gbps]
+electrical: [W, mW, kW, kWh, mA, A, mV, V, MHz, GHz, kHz, Hz, dB, dBm, nm, um, mm]
+count: [units, SKUs, orders, shipments, tickets, defects, bugs, users, customers, clients, students, leads, impressions, clicks, sessions, calls, articles, campaigns, accounts, invoices, transactions, PRs, commits, tests, endpoints, stores, suppliers, vendors, pallets, lines, records, rows, models, features]

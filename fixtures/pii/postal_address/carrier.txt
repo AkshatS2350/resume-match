@@ -1,0 +1,22 @@
+Candidate resume fixture: postal-recall
+Address: 101 Maple Road, Testville, CA 90210
+Address: 102 Maple Road, Testville, CA 90210
+Address: 103 Maple Road, Testville, CA 90210
+Address: 104 Maple Road, Testville, CA 90210
+Address: 105 Maple Road, Testville, CA 90210
+Address: 106 Maple Road, Testville, CA 90210
+Address: 107 Maple Road, Testville, CA 90210
+Address: 108 Maple Road, Testville, CA 90210
+Address: 109 Maple Road, Testville, CA 90210
+Address: 110 Maple Road, Testville, CA 90210
+Address: 111 Maple Road, Testville, CA 90210
+Address: 112 Maple Road, Testville, CA 90210
+Address: 113 Maple Road, Testville, CA 90210
+Address: 114 Maple Road, Testville, CA 90210
+Address: 115 Maple Road, Testville, CA 90210
+Address: 116 Maple Road, Testville, CA 90210
+Address: 117 Maple Road, Testville, CA 90210
+Address: 118 Maple Road, Testville, CA 90210
+Address: 119 Maple Road, Testville, CA 90210
+Address: 120 Maple Road, Testville, CA 90210
+Near miss: 90210 alone is a postal code fragment, not a postal address.

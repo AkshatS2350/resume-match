@@ -22,6 +22,7 @@ METRIC_ALLOWLIST = frozenset(
         "llm_error_total",
         "ungrounded_statement_total",
         "fabrication_attempt_total",
+        "unmapped_skill_total",
     }
 )
 LOG_FIELD_ALLOWLIST = frozenset(

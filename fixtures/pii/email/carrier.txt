@@ -1,0 +1,22 @@
+Synthetic email corpus
+person01@example.test
+person02@example.test
+person03@example.test
+person04@example.test
+person05@example.test
+person06@example.test
+person07@example.test
+person08@example.test
+person09@example.test
+person10@example.test
+person11@example.test
+person12@example.test
+person13@example.test
+person14@example.test
+person15@example.test
+person16@example.test
+person17@example.test
+person18@example.test
+person19@example.test
+person20@example.test
+Near miss: person@example is not a deliverable address.

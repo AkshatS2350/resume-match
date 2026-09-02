@@ -55,35 +55,35 @@ Nothing in this milestone parses a resume. Its purpose is that every later task 
 
 #### 1. Repository skeleton and toolchain
 
-- [ ] 1.1 [P0] Create the single-distribution backend skeleton and pin the toolchain
+- [x] 1.1 [P0] Create the single-distribution backend skeleton and pin the toolchain
   - Files: `backend/pyproject.toml`, `backend/uv.lock`, `backend/ruff.toml`, `backend/mypy.ini`, `.python-version`, `README.md`
   - Work: one Python distribution named `resumematch` with `src/` layout. Pin CPython 3.12. Add exact pins for `pydantic>=2`, `fastapi`, `uvicorn`, `pytest`, `hypothesis`, `import-linter`, `ruff`, `mypy`. No monorepo, no per-concern distributions (D-01).
   - Depends on: —
   - _Requirements: RM-SEC-003 c1, c3; RM-API-001 c7_ · _Design: Repository layout; D-01, D-33_
   - Done when: `uv sync --frozen` succeeds from a clean checkout; `ruff check backend/src` and `mypy --strict backend/src` both exit 0; `uv.lock` contains an exact version for every direct dependency; no second `pyproject.toml` exists anywhere in the repository.
 
-- [ ] 1.2 [P0] Create the concern subpackage tree with layer-declaring docstrings
+- [x] 1.2 [P0] Create the concern subpackage tree with layer-declaring docstrings
   - Files: `backend/src/resumematch/{core,skill,resume,privacy,llm,rubric,job,matching,coach,api}/__init__.py`
   - Work: create the ten subpackages from the design's repository layout. Each `__init__.py` contains only a module docstring naming the layer, the concerns it owns, and the layers it is permitted to import. No product code.
   - Depends on: 1.1
   - _Requirements: RM-API-001 c6_ · _Design: Module boundaries and layering; D-01_
   - Done when: `python -c "import resumematch.core, resumematch.skill, resumematch.resume, resumematch.privacy, resumematch.llm, resumematch.rubric, resumematch.job, resumematch.matching, resumematch.coach, resumematch.api"` exits 0; each `__init__.py` names its permitted imports.
 
-- [ ] 1.3 [P0] Create the version-controlled configuration and asset directories with README stubs
+- [x] 1.3 [P0] Create the version-controlled configuration and asset directories with README stubs
   - Files: `config/README.md`, `rubrics/README.md`, `ontology/README.md`, `fixtures/README.md`, `docs/decisions/README.md`, `docs/schemas/.gitkeep`
   - Work: create the directory skeleton for the ~18 configuration artifacts the design makes load-bearing. Each README lists the files that will live there and states that every file carries a `version` key echoed in responses.
   - Depends on: 1.1
   - _Requirements: RM-EXT-002 c4; RM-REQX-001 c8; RM-MATCH-005 c4_ · _Design: Repository layout_
   - Done when: all six paths exist and are tracked by git; `config/README.md` lists every config filename from the design's repository layout.
 
-- [ ] 1.4 [P0] Create the frontend skeleton consuming generated types only
+- [x] 1.4 [P0] Create the frontend skeleton consuming generated types only
   - Files: `web/package.json`, `web/package-lock.json`, `web/tsconfig.json`, `web/.eslintrc.cjs`, `web/src/app/layout.tsx`, `web/src/app/page.tsx`, `web/src/lib/api/generated/.gitkeep`
   - Work: Next.js + React + TypeScript app. Add an eslint rule (`no-restricted-imports` on `../generated` siblings, or an equivalent boundary rule) that forbids hand-written API type declarations outside `src/lib/api/generated/`.
   - Depends on: 1.1
   - _Requirements: RM-API-001 c5; RM-PARSE-004 c2; AS-01, AS-02_ · _Design: D-44_
   - Done when: `npm ci && npm run build` succeeds; `npx tsc --noEmit` exits 0; `npx eslint src` exits 0; `package-lock.json` is committed.
 
-- [ ] 1.5 [P0] Write `AGENTS.md` with the non-negotiable implementation rules
+- [x] 1.5 [P0] Write `AGENTS.md` with the non-negotiable implementation rules
   - Files: `AGENTS.md`
   - Work: record, for the implementing agent, the layering order, the two egress enclaves, the determinism rules (injected `Clock`, `Decimal`, sorted iteration, no `round()`), the fail-closed error paths, and the rule that a behaviour change requires a spec amendment first.
   - Depends on: 1.2
@@ -94,49 +94,49 @@ Nothing in this milestone parses a resume. Its purpose is that every later task 
 
 Built now, against an empty package, so the contracts never have to be weakened to go green.
 
-- [ ] 2.1 [P0] Write the `import-linter` layering contract
+- [x] 2.1 [P0] Write the `import-linter` layering contract
   - Files: `.importlinter`
   - Work: add `[importlinter:contract:layers]` with the ten layers in the design's order, the pinned-tool-compatible multiline `root_packages` list containing only `resumematch`, and `include_external_packages = True`.
   - Depends on: 1.2
   - _Requirements: RM-API-001 c6_ · _Design: Import contracts; D-01_
   - Done when: `lint-imports --config .importlinter` exits 0; adding a temporary `from resumematch.api import app` to `resumematch/core/__init__.py` makes it exit non-zero naming the `layers` contract; the temporary import is removed.
 
-- [ ] 2.2 [P0] Write the deny-by-default egress and provider-interface contracts
+- [x] 2.2 [P0] Write the deny-by-default egress and provider-interface contracts
   - Files: `.importlinter`
   - Work: add `[importlinter:contract:egress]` and `[importlinter:contract:provider_api]` exactly as specified in the design — `source_modules = resumematch`, v2.1-compatible top-level forbidden transport and SDK modules, `allow_indirect_imports = False`, and `ignore_imports` naming only `resumematch.llm.providers.*`, `resumematch.job.adapters.*`, `resumematch.core.egress`, `resumematch.llm.gateway`, and `resumematch.api.composition`. Set `unmatched_ignore_imports_alerting = none` only to allow these intentionally future-only exceptions before their modules exist; it must not suppress an actual forbidden import.
   - Depends on: 2.1
   - _Requirements: RM-PRIV-003 c1, c11; RM-TEST-001 c8, c11_ · _Design: The adopted mechanism, Layer 1; D-02_
   - Done when: `lint-imports` exits 0 while the future-only ignores are unmatched; a temporary `import httpx` added to `resumematch/coach/__init__.py` fails the build naming the `egress` contract; a temporary indirect chain (`coach` → new helper module → `httpx`) also fails, proving `allow_indirect_imports = False` is effective; both temporaries removed.
 
-- [ ] 2.3 [P0] Write the persistence, sanitization-record, and scoring-determinism boundaries
+- [x] 2.3 [P0] Write the persistence, sanitization-record, and scoring-determinism boundaries
   - Files: `.importlinter`, `backend/src/resumematch/job/requirements/__init__.py`, `tools/check_session_write_boundary.py`, `backend/tests/tools/test_check_session_write_boundary.py`
   - Work: create `resumematch.job.requirements` as an intentionally empty architectural boundary whose `__init__.py` contains only a module docstring; this is not RM-REQX implementation. Add the remaining valid import-linter contracts: `persistence` (no `sqlalchemy`/`sqlite3`/`psycopg`/`asyncpg` outside `resumematch.job.store.*`) and `scoring_determinism` (no `random`/`secrets`/`time`/`uuid`/`os` in `rubric`, `matching`, `job.requirements`). Do not broaden the latter to all of `resumematch.job`. Add the dedicated AST/static session-write checker: only `resumematch.privacy.sanitizer` may import or literally dynamically import `resumematch.core.session_write`; it reports the file, line, and violated rule. Do not express this sibling-safe boundary as an import-linter contract.
   - Depends on: 2.1
   - _Requirements: RM-PRIV-003 c6; RM-JOB-007 c1; RM-SCORE-003 c2; RM-MATCH-005 c3_ · _Design: Import contracts; D-09, D-15, D-20_
   - Done when: `lint-imports` exits 0 with the remaining valid contracts present; the session-write checker and its tests pass; a permitted Sanitizer import passes; a temporary forbidden import outside `privacy.sanitizer` is rejected by the checker; a temporary `import time` in `resumematch/rubric/__init__.py` fails naming `scoring_determinism`; all probes removed.
 
-- [ ] 2.4 [P0] Implement `tools/check_egress.py` — the AST escape-hatch check
+- [x] 2.4 [P0] Implement `tools/check_egress.py` — the AST escape-hatch check
   - Files: `tools/check_egress.py`, `backend/tests/tools/test_check_egress.py`
   - Work: `ast.NodeVisitor` over every file under `backend/src/resumematch/`, excluding `llm/providers/` and `job/adapters/`. Fail on: `importlib` import or `importlib.import_module`/`__import__` call; `eval`/`exec`/`compile`; `subprocess` import or `os.system`/`os.popen`/`os.exec*`; a string literal matching `^(https?|ftp|ws|wss)://`; `setattr` on a module object. Report file, line, and the rule name.
   - Depends on: 1.2
   - _Requirements: RM-PRIV-003 c11_ · _Design: Layer 3; D-05_
   - Done when: `python tools/check_egress.py backend/src` exits 0; the unit test feeds one synthetic source file per rule from a `tmp_path` fixture and asserts each is reported exactly once with its rule name, and that an identical file placed under an exempt enclave path is not reported.
 
-- [ ] 2.5 [P0] Implement `core/egress.py` — the injected transport capability with a host allow-list
+- [x] 2.5 [P0] Implement `core/egress.py` — the injected transport capability with a host allow-list
   - Files: `backend/src/resumematch/core/egress.py`, `backend/tests/unit/core/test_egress.py`
   - Work: `EgressGrant` (frozen; `enclave` literal `"llm_provider" | "job_source"`, `allowed_hosts: frozenset[str]`, `timeout_s`), `OutboundRequest`/`OutboundResponse`, the `HttpEgress` protocol, an `httpx`-backed implementation that raises `EgressHostNotAllowed` when the request host is outside the grant, and `issue_grant(settings, enclave)`. No module-level transport or provider instance anywhere.
   - Depends on: 2.2
   - _Requirements: RM-PRIV-003 c1, c4; RM-PRIV-006 c1, c3_ · _Design: Layers 2 and 4; D-03, D-04_
   - Done when: `lint-imports` still exits 0 (the `httpx` import is covered by the named exception only); a test asserts a request to an allow-listed host is attempted and a request to any other host raises `EgressHostNotAllowed` before any socket is opened (assert with a patched `socket.socket.connect` raiser); `grep -rn "issue_grant" backend/src` shows call sites only in `api/composition.py` once that file exists.
 
-- [ ] 2.6 [P0] Implement `tools/check_determinism.py`
+- [x] 2.6 [P0] Implement `tools/check_determinism.py`
   - Files: `tools/check_determinism.py`, `backend/tests/tools/test_check_determinism.py`
   - Work: AST check scoped to `rubric/`, `matching/`, `job/requirements/`. Fail on: `datetime.now`/`utcnow`/`today`, `date.today`, `time.time`/`monotonic`; `float(`; builtin `round(`; a `For` node or comprehension whose iterable is a `.keys()`/`.values()`/`.items()` call not wrapped in `sorted(...)`; `listdir`/`iterdir`/`glob`/`scandir` in `job/adapters/fixture.py`.
   - Depends on: 1.2
   - _Requirements: RM-SCORE-003 c2; RM-MATCH-005 c3; RM-SCORE-001 c9; RM-MATCH-001 c6_ · _Design: Determinism table; D-18, D-20, D-38_
   - Done when: `python tools/check_determinism.py backend/src` exits 0; the unit test asserts one report per rule against synthetic sources, and asserts that `for k in sorted(d.keys())` is accepted while `for k in d.keys()` is rejected.
 
-- [ ] 2.7 [P0] Implement `tools/check_no_domain_branch.py`
+- [x] 2.7 [P0] Implement `tools/check_no_domain_branch.py`
   - Files: `tools/check_no_domain_branch.py`, `backend/tests/tools/test_check_no_domain_branch.py`
   - Work: read the domain, role, and rubric identifiers from the rubric files present under `rubrics/` and fail the build if any appears as a literal in `rubric/engine.py`, `rubric/evidence.py`, `matching/engine.py`, or `matching/classifier.py`. Report the identifier, the file, and the line.
   - Depends on: 1.2, 1.3
@@ -145,28 +145,28 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 3. Core foundations
 
-- [ ] 3.1 [P0] Implement `core/canonical_json.py`
+- [x] 3.1 [P0] Implement `core/canonical_json.py`
   - Files: `backend/src/resumematch/core/canonical_json.py`, `backend/tests/properties/test_canonical_json.py`
   - Work: canonical serializer applying, in order, recursive lexicographic key ordering by Unicode code point, `,`/`:` separators with no whitespace, UTF-8 without BOM and `ensure_ascii=False`, NFC normalization of every string, integers only, omission of absent fields, and a `canonical_sha256` returning lowercase hex prefixed `sha256:`.
   - Depends on: 1.2
   - _Requirements: RM-PRIV-003 c6, c8_ · _Design: Canonical serialization_
   - Done when: a Hypothesis test asserts that two dicts differing only in key insertion order produce identical bytes, that NFC-equivalent but differently composed strings produce identical bytes, and that `canonical_sha256` output always matches `^sha256:[0-9a-f]{64}$`.
 
-- [ ] 3.2 [P0] Implement `core/clock.py`
+- [x] 3.2 [P0] Implement `core/clock.py`
   - Files: `backend/src/resumematch/core/clock.py`, `backend/tests/unit/core/test_clock.py`
   - Work: `Clock` protocol with `now() -> datetime` and `today() -> date`; a `SystemClock` implementation; a `FixedClock` test double. `SystemClock` is constructed nowhere in `src/` except `api/composition.py`.
   - Depends on: 1.2
   - _Requirements: RM-SCORE-003 c2; RM-MATCH-005 c3_ · _Design: D-20_
   - Done when: `grep -rn "SystemClock(" backend/src` returns at most the line in `api/composition.py`; the test asserts `FixedClock` returns its configured instant on repeated calls.
 
-- [ ] 3.3 [P0] Implement `core/config.py` — the versioned configuration loader
+- [x] 3.3 [P0] Implement `core/config.py` — the versioned configuration loader
   - Files: `backend/src/resumematch/core/config.py`, `backend/tests/unit/core/test_config.py`
   - Work: a loader that reads a YAML config file, requires a top-level `version` string, parses declared decimal fields as `Decimal` from quoted strings, and raises `ConfigInvalid` naming the file and the failing key. Also a `Settings` model reading every environment key with no default for required keys.
   - Depends on: 1.2
   - _Requirements: RM-SEC-002 c6; RM-EXT-002 c4_ · _Design: Determinism — config drift; Error Handling `CONFIG_INVALID`_
   - Done when: loading a fixture config without `version` raises `ConfigInvalid` naming the file; loading a fixture with `"0.40"` yields `Decimal("0.40")` and never a float; a missing required environment key raises with the key name in the message.
 
-- [ ] 3.4 [P0] Implement `core/schemas/version_stamp.py`
+- [x] 3.4 [P0] Implement `core/schemas/version_stamp.py`
   - Files: `backend/src/resumematch/core/schemas/version_stamp.py`, `backend/tests/unit/core/test_version_stamp.py`
   - Work: the `VersionStamp` frozen model with every field from the design (schema, engine, rubric id/version/status, alias file, evidence multiplier, match weight, threshold, confidence weight, pattern set, delimitation, relevance rule) and a `version_stamp()` factory that assembles it from loaded config objects.
   - Depends on: 3.3
@@ -441,7 +441,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 11. Candidate-side schemas
 
-- [ ] 11.1 [P0] Define `Provenance` and `ItemBase`
+- [x] 11.1 [P0] Define `Provenance` and `ItemBase`
   - Files: `backend/src/resumematch/core/schemas/candidate.py`, `backend/tests/properties/test_item_base.py`
   - Work: `Provenance` (frozen: `section_id`, `block_ids`, `start_offset`, exclusive `end_offset`). `ItemBase` (frozen: `item_id` stable within a Session, `origin` literal `"extracted" | "user_provided"`, `extraction_confidence` as `Decimal` at two decimal places in `[0, 1]`, `confidence_inputs`, `provenance` nullable only when `user_provided`, `source_text`).
   - Depends on: 9.1
@@ -551,14 +551,14 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 15. PII person-name and postal-address recall
 
-- [ ] 15.1 [P0] Build the labeled PII corpus for the two hardest categories
+- [x] 15.1 [P0] Build the labeled PII corpus for the two hardest categories
   - Files: `fixtures/pii/person_name/`, `fixtures/pii/postal_address/`, `fixtures/pii/LABELS.md`
   - Work: at least 20 labeled instances each for person names and postal addresses, embedded in resume-shaped carrier text with known character offsets. Include the adversarial cases the design names: employer and institution names that are also person names (`Morgan Stanley`, `Ernst & Young`, `Johns Hopkins`), a person name inside a retained project description, and near-miss strings that must not be redacted.
   - Depends on: 1.3
   - _Requirements: RM-TEST-002 c3; RM-PRIV-002 c6_ · _Design: Risks — PII detection recall_
   - Done when: each label file records category, zero-based start offset, exclusive end offset, and the exact substring; a test asserts each labeled substring equals the carrier slice at its offsets; each of the two categories has at least 20 instances; at least three adversarial employer-as-person-name cases are present.
 
-- [ ] 15.2 [P0] [SPIKE] Measure regex-plus-Presidio recall on the two hardest categories — time-box 1 day
+- [x] 15.2 [P0] [SPIKE] Measure regex-plus-Presidio recall on the two hardest categories — time-box 1 day
   - Files: `docs/decisions/0002-pii-detection-mechanisms.md` (kept), throwaway script under `spikes/` (deleted at the end)
   - Work: run the proposed deterministic regex/gazetteer rules and Presidio (spaCy NER) over the corpus from 15.1 and compute per-category recall and precision using the requirement's definitions — a labeled instance counts as recalled when one reported span covers every character of it and carries a Remove default. If person-name recall lands below 0.95, evaluate a second NER model, a name gazetteer, and the option of amending the threshold, and record which one is chosen.
   - Depends on: 15.1
@@ -573,28 +573,28 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 16. PII detection
 
-- [ ] 16.1 [P0] Complete the labeled PII fixture corpus for all eleven categories
+- [x] 16.1 [P0] Complete the labeled PII fixture corpus for all eleven categories
   - Files: `fixtures/pii/`, `fixtures/pii/LABELS.md`, `fixtures/pii/previous_release_figures.json`
   - Work: extend the corpus from 15.1 to every category in `RM-PRIV-002 c2` — person names, emails, telephone numbers (including international formats), postal addresses, personal profile URLs, personal website URLs, social handles, government/national identifiers, student/employee identifiers, dates of birth, and named references with contact details — at at least 20 labeled instances each, plus near-miss strings that must not be redacted. Seed `previous_release_figures.json` with the precision baseline.
   - Depends on: 15.1
   - _Requirements: RM-TEST-002 c3; RM-PRIV-002 c6, c7_ · _Design: `fixtures/pii/`_
   - Done when: a test asserts every category named in `RM-PRIV-002 c2` has at least 20 labeled instances; a test asserts every labeled substring equals its carrier slice; `previous_release_figures.json` contains one precision figure per category.
 
-- [ ] 16.2 [P0] Write `config/pii_policy.yaml` and its loader
+- [x] 16.2 [P0] Write `config/pii_policy.yaml` and its loader
   - Files: `config/pii_policy.yaml`, `backend/src/resumematch/privacy/policy.py`, `backend/tests/unit/privacy/test_policy.py`
   - Work: express the v1 policy table as version-controlled configuration — every category with a `Remove` or `Retain` default and the field paths that carry a Retain default (employer names, institution names, certification names and issuers, job titles, skill and technology names, project descriptions, quantified impact statements, employment date ranges, degree fields and levels). Include the minimum classification confidence floor from the 15.2 decision. No inline conditionals anywhere.
   - Depends on: 3.3, 15.2
   - _Requirements: RM-PRIV-002 c3, c5, c8; OD-03_ · _Design: Policy table_ · _Property: 44_
   - Done when: the loader rejects a policy file missing a category named in `RM-PRIV-002 c2`; a test asserts `grep -rn '"person_name"\|"postal_address"' backend/src/resumematch/privacy` finds no default-bearing conditional, only lookups against the loaded policy.
 
-- [ ] 16.3 [P0] Write `config/pii_placeholders.yaml` and the placeholder module
+- [x] 16.3 [P0] Write `config/pii_placeholders.yaml` and the placeholder module
   - Files: `config/pii_placeholders.yaml`, `backend/src/resumematch/privacy/placeholders.py`, `backend/tests/unit/privacy/test_placeholders.py`
   - Work: one category-labelled constant token per category of the form `[[CATEGORY]]`, carrying no length and no content information. Placeholder tokens are themselves excluded from detection.
   - Depends on: 16.2
   - _Requirements: RM-PRIV-002 c2, c9; OD-24_ · _Design: D-21_
   - Done when: a test asserts every category in the policy has exactly one placeholder; a test asserts two values of the same category with different lengths produce the identical token; a test asserts a detection pass over text containing only placeholders reports zero findings.
 
-- [ ] 16.4 [P0] Implement the deterministic pattern-and-gazetteer detection mechanism
+- [x] 16.4 [P0] Implement the deterministic pattern-and-gazetteer detection mechanism
   - Files: `backend/src/resumematch/privacy/detectors/rules.py`, `config/pii_rules.yaml`, `backend/tests/unit/privacy/test_rule_detector.py`
   - Work: version-controlled regex and gazetteer rules per category, each reported span carrying a zero-based start offset, an exclusive end offset, exactly one category, and a classification confidence in `[0.00, 1.00]`.
   - Depends on: 16.2, 16.1
@@ -705,14 +705,14 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 19. Honest privacy claims
 
-- [ ] 19.1 [P0] Write the user-facing privacy copy
+- [x] 19.1 [P0] Write the user-facing privacy copy
   - Files: `web/src/content/privacy-copy.ts`, `web/tests/privacy-copy.test.ts`
   - Work: state the guarantee as exactly "Resume files are not persistently stored by ResumeMatch servers." Describe PII removal as a risk-reduction layer and state that a distinctive career history can remain identifying after direct identifiers are removed. Disclose that employer, institution, and certification names are retained in the `Sanitized_Resume`, with the reason. Exclude any claim that content never leaves the device, and any claim of anonymity, guaranteed de-identification, or that no data touches disk.
   - Depends on: 1.4
   - _Requirements: RM-PRIV-005 c1, c2, c3, c4, c5_ · _Design: C-2 resolution_
   - Done when: a component test asserts the exact guarantee string is rendered; asserts the risk-reduction sentence and the retention disclosure with its reason are rendered; asserts none of the prohibited claim strings appears in the rendered DOM.
 
-- [ ] 19.2 [P0] Implement `tools/check_prohibited_claims.py` and wire it to the `privacy` gate
+- [x] 19.2 [P0] Implement `tools/check_prohibited_claims.py` and wire it to the `privacy` gate
   - Files: `tools/check_prohibited_claims.py`, `config/prohibited_claims.yaml`, `backend/tests/tools/test_check_prohibited_claims.py`, `.github/workflows/ci.yml`
   - Work: scan every user-facing copy file under `web/src/` for the prohibited claim strings from `RM-PRIV-005` c3 and c4, held in version-controlled configuration, and fail the build on a match naming the file, the line, and the string.
   - Depends on: 19.1
@@ -766,28 +766,28 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 22. Skill normalization — build first
 
-- [ ] 22.1 [P0] Implement the deterministic fold function
+- [x] 22.1 [P0] Implement the deterministic fold function
   - Files: `backend/src/resumematch/skill/fold.py`, `backend/tests/properties/test_fold.py`
   - Work: the design's exact sequence — NFKC, `casefold`, replace every run of characters outside `[0-9a-z+#.]` with a space, collapse spaces and strip, join `+` and `#` to their neighbours, strip a trailing `.`.
   - Depends on: 1.2
   - _Requirements: RM-SKILL-001 c5_ · _Design: Folding function; D-39_ · _Property: 7_
   - Done when: a Hypothesis test asserts `fold(fold(s)) == fold(s)` for all generated strings; a table test asserts `"C++"`, `"c++"`, `"C ++"`, and `"C  +  +"` all fold to `"c++"`, and `"C#"`, `"c #"` both fold to `"c#"`.
 
-- [ ] 22.2 [P0] Write `ontology/skills.yaml` and implement the alias loader
+- [x] 22.2 [P0] Write `ontology/skills.yaml` and implement the alias loader
   - Files: `ontology/skills.yaml`, `backend/src/resumematch/skill/alias_loader.py`, `backend/tests/unit/skill/test_alias_loader.py`
   - Work: version `skills@1`. Each entry has a canonical `id`, a `display` name, at least one `category`, and an `aliases` list. Limited to the skills the five reference rubrics reference, plus their aliases — not a general ontology. The loader folds every alias and fails to load on a duplicate folded alias mapped to two identifiers, reporting both entries.
   - Depends on: 22.1, 3.3
   - _Requirements: RM-SKILL-001 c1, c2, c7, c8_ · _Design: `ontology/skills.yaml`_
   - Done when: the loader rejects a file in which `"py"` maps to both `python` and `pypi`, naming both entries; a test asserts every entry has an id, a display name, at least one category, and at least one alias; a test asserts the loaded version string is `skills@1`.
 
-- [ ] 22.3 [P0] Implement the longest-match-first trie and `Skill_Normalizer`
+- [x] 22.3 [P0] Implement the longest-match-first trie and `Skill_Normalizer`
   - Files: `backend/src/resumematch/skill/normalizer.py`, `backend/tests/properties/test_skill_normalizer.py`
   - Work: a trie over folded aliases, matched longest-first with ties broken by the lexicographically lowest canonical id, giving order-independent and idempotent results. `normalize(surface) -> CanonicalSkill` and `extract(text) -> tuple[CanonicalSkill, ...]`. An unmatched surface yields `CanonicalSkill(id=f"unmapped:{fold(s)}", display=s)` and is appended to a review list. The same alias file serves the profile path and the job-requirement path.
   - Depends on: 22.2
   - _Requirements: RM-SKILL-001 c1, c3, c4, c5, c6_ · _Design: D-39, D-42_ · _Property: 7_
   - Done when: a Hypothesis test asserts `normalize(normalize(s).id) == normalize(s)`; asserts every alias and every case/punctuation variant of it resolves to one identifier; asserts the identifier from the profile path equals the identifier from the requirement path for the same surface; a test asserts an unmapped surface preserves the original string and lands in the review list; a test asserts `extract` over a token sequence containing both `"react"` and `"react native"` returns the longer match.
 
-- [ ] 22.4 [P1] Add the unmapped-skill-rate metric
+- [x] 22.4 [P1] Add the unmapped-skill-rate metric
   - Files: `backend/src/resumematch/skill/normalizer.py`, `backend/src/resumematch/core/telemetry.py`, `backend/tests/unit/skill/test_unmapped_metric.py`
   - Work: emit the unmapped-skill rate as a counter over allow-listed metric names, so AS-12's validation figure is observable and OD-12 can be reopened on evidence.
   - Depends on: 22.3, 3.6
@@ -796,14 +796,14 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 23. Evidence model
 
-- [ ] 23.1 [P0] Write `config/quantity_units.yaml` and `config/proficiency_exclusions.yaml`
+- [x] 23.1 [P0] Write `config/quantity_units.yaml` and `config/proficiency_exclusions.yaml`
   - Files: `config/quantity_units.yaml`, `config/proficiency_exclusions.yaml`, `backend/tests/unit/rubric/test_evidence_config.py`
   - Work: transcribe both files exactly as the design specifies — `units@1` with its percent tokens, currency symbols and codes, magnitude, time, throughput, data, electrical, and count lists; `proficiency_exclusions@1` with its word and phrase list.
   - Depends on: 3.3
   - _Requirements: RM-EVID-001 c3, c7_ · _Design: `config/quantity_units.yaml`, `config/proficiency_exclusions.yaml`_
   - Done when: both files load with their version strings; a test asserts each of the eight unit groups in the design's file is present and non-empty; a test asserts `expert`, `advanced`, and `extensive` are all in the exclusion list.
 
-- [ ] 23.2 [P0] Implement the `quantified_impact` detector
+- [x] 23.2 [P0] Implement the `quantified_impact` detector
   - Files: `backend/src/resumematch/rubric/quantity.py`, `backend/tests/properties/test_quantified_impact.py`
   - Work: true exactly when a numeral is separated by at most one space from a percent token, a currency symbol, or a listed unit — after excluding four-digit values in 1900–2100, any value located in the item's date fields, and dotted version patterns matching `\d+\.\d+(\.\d+)*`. Record the matched quantity's item identifier and character offsets. The flag never changes an Evidence_Level.
   - Depends on: 23.1
@@ -824,7 +824,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-EVID-001 c1, c2, c4, c5, c6_ · _Design: Evidence_Assigner; D-18, D-43_ · _Property: 1, 3, 8, 9_
   - Done when: a Hypothesis test over `section_permutations()` asserts identical levels and `quantified_impact` flags under every within-section item-order permutation; a test asserts every referenced skill unsupported by any item receives Level 0; a test asserts the assigned level equals the maximum per-item level where two or more items support one skill; `CountingStubProvider` records zero invocations; `tools/check_determinism.py` reports no finding in the module.
 
-- [ ] 23.5 [P0] Write `config/evidence_multipliers.yaml` and its validating loader
+- [x] 23.5 [P0] Write `config/evidence_multipliers.yaml` and its validating loader
   - Files: `config/evidence_multipliers.yaml`, `backend/src/resumematch/rubric/multipliers.py`, `backend/tests/unit/rubric/test_multipliers.py`
   - Work: version `evidence_multipliers@1` with `{0: "0.00", 1: "0.40", 2: "0.70", 3: "1.00"}` as quoted strings parsed to `Decimal`. The loader requires exactly one entry per level defined by `RM-EVID-001`, every value in `[0.0, 1.0]`, level 0 exactly `0.0`, and values non-decreasing as level increases. One file, read by both the Rubric_Engine and the Matching_Engine.
   - Depends on: 3.3
@@ -833,14 +833,14 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 24. Rubric schema and loading
 
-- [ ] 24.1 [P0] Define the `Role_Rubric` Pydantic schema
+- [x] 24.1 [P0] Define the `Role_Rubric` Pydantic schema
   - Files: `backend/src/resumematch/core/schemas/rubric.py`, `backend/tests/properties/test_rubric_schema.py`
   - Work: transcribe the design's schema — `schema_version: role_rubric/1`, `rubric_id`, `role_id`, `role_family`, `domain_id`, `seniority_id`, `rubric_version`, `status`, `weight_basis`, `weight_basis_note`, `experience_bands`, `education_expectations`, `certification_expectations`, `categories` (each with `weight`, `signals`, `alternative_groups`), and rubric-level `penalties`. `Signal.type` is the closed enum `skill | experience_band | education | certification | flag`. `penalty.condition.kind` is the closed enum `no_item_in_section | signal_below_level | all_signals_absent_in_category | total_experience_below`.
   - Depends on: 3.4
   - _Requirements: RM-RUB-001 c1, c2, c7; RM-EXT-001 c5; RM-EXT-002 c1, c5_ · _Design: Rubric_Loader and the Role_Rubric schema_ · _Property: 2_
   - Done when: a Hypothesis round-trip test asserts load → serialize → load produces an equivalent in-memory rubric; a test asserts a rubric declaring a `condition.kind` outside the enumeration is rejected; a test asserts `status` accepts only `draft`, `reviewed`, `stable`.
 
-- [ ] 24.2 [P0] Implement `Rubric_Loader` validation
+- [x] 24.2 [P0] Implement `Rubric_Loader` validation
   - Files: `backend/src/resumematch/rubric/loader.py`, `backend/tests/unit/rubric/test_rubric_loader.py`
   - Work: reject a rubric whose category weights do not sum to 100; reject a `type: skill` signal that resolves to no canonical skill in the alias file unless declared as a non-skill signal type; fail the whole load and report both paths when two files declare the same `(role_id, domain_id, seniority_id)` triple. Validate every file at startup, reporting each failure with the file path and the failing field, and continue serving the valid rubrics.
   - Depends on: 24.1, 22.2
@@ -921,7 +921,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-CONF-001 c8_ · _Design: `determinability` is recorded by the resolvers_ · _Property: 17_
   - Done when: a Hypothesis test asserts `indeterminate` is recorded exactly under the three conditions and never otherwise; a test asserts a skill the engine determines to be absent from parsed evidence is recorded `determinable`; a test asserts a user-confirmed low-confidence item yields `determinable`.
 
-- [ ] 26.3 [P0] Implement the `Decimal` arithmetic helpers
+- [x] 26.3 [P0] Implement the `Decimal` arithmetic helpers
   - Files: `backend/src/resumematch/rubric/arithmetic.py`, `backend/tests/properties/test_arithmetic.py`
   - Work: a pinned `Decimal` context (`prec=28`), `quantize_half_up(x)`, `clamp(x, lo, hi)`, and a `sum_sorted(pairs)` that accumulates over sorted identifiers. Builtin `round()` and `float()` are absent from every scoring module.
   - Depends on: 1.2
@@ -1026,7 +1026,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 31. Confidence model
 
-- [ ] 31.1 [P1] Write `config/confidence_weights.yaml` and its validating loader
+- [x] 31.1 [P1] Write `config/confidence_weights.yaml` and its validating loader
   - Files: `config/confidence_weights.yaml`, `backend/src/resumematch/rubric/confidence_config.py`, `backend/tests/unit/rubric/test_confidence_config.py`
   - Work: transcribe the design's file — `term_order`, `readiness_weights` `0.30 / 0.25 / 0.45`, `match_weights` `0.25 / 0.20 / 0.35 / 0.20`, `bands` `low_medium: 0.50` and `medium_high: 0.75`, the six-section `profile_sections` list excluding `summary` and `unclassified`, and the `dimension_field_mapping`. The loader rejects, without computing any value and with an error naming the offending entries, a weight set that omits or duplicates a term of its term set, contains a weight outside `[0.0, 1.0]`, or whose weights do not sum to 1.0 within 0.001. It rejects a threshold set unless both thresholds are present, in `[0.00, 1.00]` at no more than two decimal places, and `low_medium < medium_high`.
   - Depends on: 3.3
@@ -1069,12 +1069,12 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 33. Greenhouse per-organization posting yield
 
-- [ ] 33.1 [P1] [SPIKE] Measure per-organization yield across candidate job sources — time-box half a day
+- [x] 33.1 [P1] [SPIKE] Measure per-organization yield across candidate job sources — time-box half a day
   - Files: `docs/decisions/0005-first-live-job-source.md` (kept), throwaway script under `spikes/` (deleted at the end)
   - Work: query five candidate Greenhouse public boards and one universal-search source, count the postings matching the five reference role families, and record the per-organization yield. If per-organization yield is in single digits, record that the seed list must be roughly ten times larger than "a documented seed list" implies, and record whether OD-05's Adzuna-as-universal-search proposal should be promoted from second to first. Also record the sampling bias the design names: coverage skews toward companies that use Greenhouse.
   - Depends on: 1.3
   - _Requirements: RM-JOB-003 c6; AS-11; OD-05_ · _Design: Risks — live ATS coverage breadth; D-47_
-  - Done when: `docs/decisions/0005-first-live-job-source.md` records the per-organization posting count for each of the six sources queried, the projected registry size needed for 100 relevant postings across five role families, an explicit first-live-source recommendation, and the sampling-bias statement that `RM-JOB-006` will have to disclose. The `spikes/` directory is deleted and absent from the final commit.
+  - Done when: `docs/decisions/0005-first-live-job-source.md` records the per-organization posting count for each measured public board, the projected registry size needed for 100 relevant postings across five role families, an explicit first-live-source recommendation, and the sampling-bias statement that `RM-JOB-006` will have to disclose. The spike status is exactly one of `completed_with_live_measurement`, `completed_with_public_board_measurement_only`, `blocked_external_credential`, or `deferred_until_credentials_available`. A public-board-only result records the unavailable universal-search source, its missing credential, the condition that reopens the measurement, and that the fixture-based First Closed Loop is unaffected. The `spikes/` directory is deleted and absent from the final commit.
 
 ---
 
@@ -1082,7 +1082,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 34. Job-side schemas
 
-- [ ] 34.1 [P0] Define the `ExtractedRequirement` schema
+- [x] 34.1 [P0] Define the `ExtractedRequirement` schema
   - Files: `backend/src/resumematch/core/schemas/job.py`, `backend/tests/properties/test_extracted_requirement.py`
   - Work: frozen model with `requirement_id`, `classification` literal `required | preferred | contextual`, `low_confidence`, nullable `canonical_skill_id`, `unit_text`, `start_offset`, exclusive `end_offset`, `unit_id`, nullable `excluded_category` from the four-member enumeration, `pattern_set_version`, `delimitation_version`.
   - Depends on: 3.4
@@ -1105,7 +1105,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-JOB-002 c1, c2, c6; RM-JOB-004 c3, c6; RM-JOB-008 c4_ · _Design: Job_Source interface_
   - Done when: a test enumerates every parameter and return type in the interface and asserts none is a candidate type; a test asserts `SourceCapabilities.documentation_url` is required; a test asserts `map` returns a draft type distinct from `JobPosting`.
 
-- [ ] 35.2 [P0] Author the Fixture job set with its ordered manifest
+- [x] 35.2 [P0] Author the Fixture job set with its ordered manifest
   - Files: `fixtures/jobs/default/manifest.yaml`, `fixtures/jobs/default/postings/*.json`
   - Work: `manifest.yaml` at `set_version: fixture_jobs@1` listing postings in explicit order. Six postings: a complete posting, one with no requirement language, one with conflicting experience figures, a duplicate of the first, one with missing fields, and a malformed source response. `retrieved_at` and `posted_at` are literals in the files, never a clock value.
   - Depends on: 1.3
@@ -1330,28 +1330,28 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 43. Match configuration
 
-- [ ] 43.1 [P0] Write `config/match_weights.yaml` and its validating loader
+- [x] 43.1 [P0] Write `config/match_weights.yaml` and its validating loader
   - Files: `config/match_weights.yaml`, `backend/src/resumematch/matching/config.py`, `backend/tests/unit/matching/test_match_weights.py`
   - Work: version `match_weights@1` with the AS-07 defaults 30 / 20 / 15 / 10 / 10 / 10 / 5 for skills, experience, role similarity, seniority, education, location-and-work-mode, and domain signals. Reject at load, without computing any score and with an error naming the offending entries, a set whose weights do not sum to 100 within 0.01, containing a weight outside `[0, 100]`, or omitting or duplicating a dimension.
   - Depends on: 3.3
   - _Requirements: RM-MATCH-001 c2; AS-07; OD-07_ · _Design: Dimension scorers_
   - Done when: unit tests assert each of the four rejection conditions with the expected error content; a test asserts all seven dimensions are present and the weights sum to exactly 100.
 
-- [ ] 43.2 [P0] Write `config/match_penalties.yaml` and `config/match_thresholds.yaml` with their loaders
+- [x] 43.2 [P0] Write `config/match_penalties.yaml` and `config/match_thresholds.yaml` with their loaders
   - Files: `config/match_penalties.yaml`, `config/match_thresholds.yaml`, `backend/src/resumematch/matching/config.py`, `backend/tests/unit/matching/test_penalties_thresholds.py`
   - Work: the absent-Preferred_Requirement penalty and the absent-Hard_Requirement penalty, with a loader that rejects a set in which the preferred penalty is not strictly smaller than the hard penalty. Thresholds `strong_apply: 75` and `stretch: 55`, with a loader requiring both present, integers in `[0, 100]`, and `stretch < strong_apply`, rejecting with an error naming the violated constraint and assigning no `Match_Class` until a valid set is supplied.
   - Depends on: 3.3
   - _Requirements: RM-MATCH-001 c4; RM-MATCH-003 c8; AS-08; OD-08_ · _Design: Classifier_
   - Done when: a test asserts a penalty set with the preferred penalty equal to the hard penalty is rejected; tests assert each of the threshold constraints is enforced with the violated constraint named; a test asserts no `Match_Class` is produced while the threshold set is invalid.
 
-- [ ] 43.3 [P0] Write `config/disqualification.yaml` and `config/relevance_rule.yaml`
+- [x] 43.3 [P0] Write `config/disqualification.yaml` and `config/relevance_rule.yaml`
   - Files: `config/disqualification.yaml`, `config/relevance_rule.yaml`, `backend/tests/unit/matching/test_disqualification_config.py`
   - Work: `disqualification@1` with `unmet_required_threshold: 2` (integer 1–10), `seniority_tolerance_years: 2` (integer 0–10), and the four `excluded_requirement_categories` — work authorization, visa status, sponsorship, security clearance and citizenship. `relevance_rule@all_dated_v1` with `rule: all_dated`, `min_span_months: 1`, `present_resolves_to: session_start_date`.
   - Depends on: 3.3
   - _Requirements: RM-MATCH-002 c3, c4, c6, c8; AS-14; OD-22_ · _Design: `config/disqualification.yaml`; D-24_
   - Done when: loaders reject a threshold of 0 or 11 and a tolerance of 11, naming the range; a test asserts all four excluded categories are present; a test asserts the relevance rule version string is `relevance_rule@all_dated_v1`.
 
-- [ ] 43.4 [P0] Write `config/role_family_equivalence.yaml` and `config/company_domain_mapping.yaml`
+- [x] 43.4 [P0] Write `config/role_family_equivalence.yaml` and `config/company_domain_mapping.yaml`
   - Files: `config/role_family_equivalence.yaml`, `config/company_domain_mapping.yaml`, `backend/tests/unit/matching/test_equivalence_tables.py`
   - Work: transcribe both tables from the design, including the deliberate asymmetry (embedded → software 70 versus software → embedded 65) and the `by_role_family_fallback` layer that derives a domain for an unlisted company from its role family. An absent ordered pair scores 0.
   - Depends on: 3.3
@@ -1363,7 +1363,9 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 - [ ] 44.1 [P0] Implement `Total_Relevant_Experience` as an interval union
   - Files: `backend/src/resumematch/matching/experience.py`, `backend/tests/properties/test_total_experience.py`
   - Work: admit the experience entries the configured relevance rule allows (all dated entries with a span of at least one calendar month, `present` resolving to `session_start_date`), convert to month indices, merge overlapping intervals so any calendar period covered by two or more entries counts once, and express the total in years quantized to one decimal place with `ROUND_DOWN`. Record the computed value and the identifiers of every contributing entry.
-  - Depends on: 43.3, 26.3
+  - Depends on: 43.3, 26.3, 11.2
+  - Ordering note: this task requires `ExperienceItem` and `CandidateProfile` from
+    Task 11.2. It cannot truthfully execute before those candidate schemas exist.
   - _Requirements: RM-MATCH-002 c8; OD-22_ · _Design: Total_Relevant_Experience; D-24 · _Property: 29_
   - Done when: a Hypothesis test over experience sets asserts the result equals the measure of the union of admitted intervals truncated toward zero to one decimal year; a unit test with two fully overlapping 12-month entries asserts 1.0 year and not 2.0; tests assert 17 months yields `Decimal("1.4")` and 18 months yields `Decimal("1.5")`; a test asserts the contributing item identifiers are recorded and sorted; `tools/check_determinism.py` reports no clock use.
 
@@ -1931,7 +1933,7 @@ Wave-level. Each wave below is a set of tasks with no dependency on each other, 
     },
     {
       "wave": 5,
-      "tasks": ["2.5", "3.7", "4.1", "5.2", "5.3", "9.1", "9.2", "16.1", "16.2", "22.3", "23.2", "24.1", "34.1", "44.1"],
+      "tasks": ["2.5", "3.7", "4.1", "5.2", "5.3", "9.1", "9.2", "16.1", "16.2", "22.3", "23.2", "24.1", "34.1"],
       "description": "Injected egress capability, the Session store, the FastAPI application, the six no-override CI gate jobs, and the `Skill_Normalizer` that Deviation 1 makes a prerequisite of M2."
     },
     {
@@ -1946,7 +1948,7 @@ Wave-level. Each wave below is a set of tasks with no dependency on each other, 
     },
     {
       "wave": 8,
-      "tasks": ["8.2", "11.3", "12.2", "16.6", "16.7", "23.3", "25.2", "25.3", "25.4", "25.5", "28.1", "28.3", "35.3", "36.4", "37.1", "37.4", "39.2"],
+      "tasks": ["8.2", "11.3", "12.2", "16.6", "16.7", "23.3", "25.2", "25.3", "25.4", "25.5", "28.1", "28.3", "35.3", "36.4", "37.1", "37.4", "39.2", "44.1"],
       "description": "Magic-byte detection, the profile schemas, span overlap resolution, the four remaining reference rubrics, the Fixture `Job_Source_Adapter`, and requirement delimitation."
     },
     {

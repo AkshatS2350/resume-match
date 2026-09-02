@@ -1,0 +1,22 @@
+version: company_domain_mapping@1
+domains: [software_saas, financial_services, semiconductor_hardware, consumer_retail, industrial_logistics, healthcare, public_sector, unknown]
+by_company_fold:
+  northwind systems: software_saas
+  meridian capital: financial_services
+  helios semiconductor: semiconductor_hardware
+by_role_family_fallback:
+  software_engineering: software_saas
+  finance: financial_services
+  embedded_firmware: semiconductor_hardware
+  marketing: consumer_retail
+  supply_chain_ops: industrial_logistics
+  unknown: unknown
+pair_scores:
+  software_saas: {software_saas: 100, semiconductor_hardware: 55, financial_services: 30, consumer_retail: 30, industrial_logistics: 25, healthcare: 25, public_sector: 20, unknown: 0}
+  financial_services: {financial_services: 100, public_sector: 40, software_saas: 30, industrial_logistics: 30, consumer_retail: 25, healthcare: 20, semiconductor_hardware: 10, unknown: 0}
+  semiconductor_hardware: {semiconductor_hardware: 100, industrial_logistics: 45, software_saas: 55, healthcare: 20, consumer_retail: 15, financial_services: 10, public_sector: 15, unknown: 0}
+  consumer_retail: {consumer_retail: 100, industrial_logistics: 45, software_saas: 30, financial_services: 25, healthcare: 15, semiconductor_hardware: 15, public_sector: 10, unknown: 0}
+  industrial_logistics: {industrial_logistics: 100, consumer_retail: 45, semiconductor_hardware: 45, financial_services: 30, software_saas: 25, public_sector: 25, healthcare: 20, unknown: 0}
+  healthcare: {healthcare: 100, public_sector: 35, financial_services: 20, software_saas: 25, industrial_logistics: 20, consumer_retail: 15, semiconductor_hardware: 20, unknown: 0}
+  public_sector: {public_sector: 100, healthcare: 35, financial_services: 40, industrial_logistics: 25, software_saas: 20, consumer_retail: 10, semiconductor_hardware: 15, unknown: 0}
+  unknown: {unknown: 0}

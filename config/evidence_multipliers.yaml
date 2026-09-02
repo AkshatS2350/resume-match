@@ -1,0 +1,6 @@
+version: evidence_multipliers@1
+multipliers:
+  0: "0.00"
+  1: "0.40"
+  2: "0.70"
+  3: "1.00"

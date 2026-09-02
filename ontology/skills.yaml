@@ -1,0 +1,42 @@
+version: skills@1
+skills:
+  - id: python
+    display: Python
+    categories: [language]
+    aliases: [python, py]
+  - id: javascript
+    display: JavaScript
+    categories: [language]
+    aliases: [javascript, js]
+  - id: sql
+    display: SQL
+    categories: [language, data]
+    aliases: [sql]
+  - id: react
+    display: React
+    categories: [frontend]
+    aliases: [react, react.js]
+  - id: docker
+    display: Docker
+    categories: [platform]
+    aliases: [docker]
+  - id: aws
+    display: AWS
+    categories: [cloud]
+    aliases: [aws, amazon web services]
+  - id: excel
+    display: Excel
+    categories: [finance, operations]
+    aliases: [excel, microsoft excel]
+  - id: tableau
+    display: Tableau
+    categories: [analytics]
+    aliases: [tableau]
+  - id: autocad
+    display: AutoCAD
+    categories: [hardware]
+    aliases: [autocad]
+  - id: supply-chain
+    display: Supply Chain
+    categories: [operations]
+    aliases: [supply chain, supply-chain]

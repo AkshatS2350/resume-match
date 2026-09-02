@@ -1,0 +1,14 @@
+set_version: fixture_jobs@1
+postings:
+  - file: complete.json
+    note: complete baseline posting
+  - file: no-requirements.json
+    note: posting without requirement language
+  - file: conflicting-experience.json
+    note: conflicting experience figures
+  - file: duplicate-complete.json
+    note: duplicate of complete.json for deduplication coverage
+  - file: missing-fields.json
+    note: source response missing optional posting fields
+  - file: malformed.json
+    note: malformed source response retained for per-posting isolation

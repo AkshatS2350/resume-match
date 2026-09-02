@@ -1,0 +1,9 @@
+version: role_family_equivalence@1
+families: [software_engineering, finance, embedded_firmware, marketing, supply_chain_ops, unknown]
+pairs:
+  software_engineering: {software_engineering: 100, embedded_firmware: 65, finance: 20, marketing: 10, supply_chain_ops: 15, unknown: 0}
+  embedded_firmware: {embedded_firmware: 100, software_engineering: 70, supply_chain_ops: 15, finance: 5, marketing: 0, unknown: 0}
+  finance: {finance: 100, supply_chain_ops: 45, marketing: 25, software_engineering: 15, embedded_firmware: 5, unknown: 0}
+  marketing: {marketing: 100, finance: 25, supply_chain_ops: 20, software_engineering: 10, embedded_firmware: 0, unknown: 0}
+  supply_chain_ops: {supply_chain_ops: 100, finance: 45, marketing: 20, software_engineering: 20, embedded_firmware: 15, unknown: 0}
+  unknown: {software_engineering: 0, finance: 0, embedded_firmware: 0, marketing: 0, supply_chain_ops: 0, unknown: 0}
