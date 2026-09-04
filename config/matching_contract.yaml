@@ -1,0 +1,25 @@
+matching_contract_version: matching_contract@1
+enablement_rules_version: enablement_rules@1
+enabled_dimensions:
+  - skills
+  - experience
+  - role_similarity
+  - seniority
+  - education
+  - location_workmode
+  - domain_signals
+dimension_ids:
+  - skills
+  - experience
+  - role_similarity
+  - seniority
+  - education
+  - location_workmode
+  - domain_signals
+enablement_reasons:
+  - enabled_by_config
+  - disabled_by_config
+  - insufficient_candidate_data
+  - insufficient_job_data
+  - not_applicable_to_job
+  - blocked_by_hard_requirement

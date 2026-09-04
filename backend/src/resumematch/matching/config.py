@@ -8,6 +8,8 @@ from typing import cast
 
 import yaml
 
+from resumematch.matching.contracts import MatchConfig, load_matching_contract
+
 
 class MatchConfigError(ValueError):
     pass
@@ -15,8 +17,13 @@ class MatchConfigError(ValueError):
 
 DIMENSIONS = frozenset(
     {
-        "skills", "experience", "role_similarity", "seniority", "education",
-        "location_workmode", "domain_signals",
+        "skills",
+        "experience",
+        "role_similarity",
+        "seniority",
+        "education",
+        "location_workmode",
+        "domain_signals",
     }
 )
 
@@ -41,6 +48,21 @@ def load_match_weights(path: Path) -> dict[str, Decimal]:
     if invalid_range or sum(values.values(), Decimal("0")) != 100:
         raise MatchConfigError(f"{path}: weights")
     return values
+
+
+def load_match_config(contract_path: Path, weights_path: Path) -> MatchConfig:
+    """Load the generic matching contract together with its validated Decimal weights."""
+    contract = load_matching_contract(contract_path)
+    weights = load_match_weights(weights_path)
+    return MatchConfig(
+        matching_contract_version=contract.version,
+        enablement_rules_version=contract.enablement_rules_version,
+        dimension_weights={
+            dimension: weights[dimension.value] / Decimal("100")
+            for dimension in sorted(contract.dimension_ids, key=lambda value: value.value)
+        },
+        enabled_dimensions=contract.enabled_dimensions,
+    )
 
 
 def load_penalties(path: Path) -> tuple[Decimal, Decimal]:

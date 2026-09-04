@@ -8,8 +8,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
-      - run: uv run --project backend ruff check src tests
-      - run: uv run --project backend mypy --strict src
+      - run: uv run --project backend ruff check backend/src backend/tests
+      - run: uv run --project backend mypy --strict backend/src
   unit:
     runs-on: ubuntu-latest
     steps:
@@ -54,7 +54,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: test -n "$(find fixtures/pii -type f 2>/dev/null)"
+      - uses: astral-sh/setup-uv@v5
+      - run: uv run --project backend python tools/eval_pii.py
   reqx-accuracy:
     runs-on: ubuntu-latest
     steps:

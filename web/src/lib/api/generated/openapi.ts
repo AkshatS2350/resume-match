@@ -1,5 +1,15 @@
 // Generated from docs/schemas/openapi.json. Do not edit.
 
+export interface Body_upload_resume_api_v1_sessions_resume_post {
+  file: string;
+}
+
+export interface ExtractionResponse {
+  extraction_ok: boolean;
+  page_count: number;
+  warnings?: unknown;
+}
+
 export interface HTTPValidationError {
   detail?: unknown;
 }

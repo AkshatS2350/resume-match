@@ -20,6 +20,8 @@ def test_version_stamp_has_all_design_fields() -> None:
         "pattern_set_version",
         "delimitation_version",
         "relevance_rule_version",
+        "candidate_context_resolver_version",
+        "dimension_match_scoring_version",
     }
     assert expected <= fields
 

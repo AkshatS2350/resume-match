@@ -110,3 +110,6 @@ ExtractionFailedError: type[PipelineError] = _error_type(
 ExtractionTimeoutError: type[PipelineError] = _error_type(
     "ExtractionTimeoutError", ErrorCode.EXTRACTION_TIMEOUT
 )
+PiiDetectionUnavailableError: type[PipelineError] = _error_type(
+    "PiiDetectionUnavailableError", ErrorCode.PII_DETECTION_UNAVAILABLE
+)

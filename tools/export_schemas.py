@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend" / "src"))
 
 from resumematch.api.app import app  # noqa: E402
+from resumematch.core.schemas.candidate import CandidateProfile, StructuredResume  # noqa: E402
+from resumematch.core.schemas.job import JobPosting  # noqa: E402
 
 
 def main() -> None:
@@ -17,6 +19,15 @@ def main() -> None:
     schema_path = ROOT / "docs" / "schemas" / "openapi.json"
     types_path = ROOT / "web" / "src" / "lib" / "api" / "generated" / "openapi.ts"
     schema_path.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    for filename, model in (
+        ("candidate_profile.schema.json", CandidateProfile),
+        ("job_posting.schema.json", JobPosting),
+        ("structured_resume.schema.json", StructuredResume),
+    ):
+        (ROOT / "docs" / "schemas" / filename).write_text(
+            json.dumps(model.model_json_schema(), indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     components = document.get("components", {}).get("schemas", {})
     declarations = ["// Generated from docs/schemas/openapi.json. Do not edit.", ""]
     for name in sorted(components):

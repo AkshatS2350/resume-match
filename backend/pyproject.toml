@@ -9,6 +9,7 @@ description = "Privacy-first deterministic job-application decision engine"
 readme = "../README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "alembic==1.16.5",
     "defusedxml==0.7.1",
     "fastapi==0.115.12",
     "httpx==0.28.1",
@@ -18,6 +19,7 @@ dependencies = [
     "python-docx==1.1.2",
     "python-multipart==0.0.20",
     "pyyaml==6.0.2",
+    "sqlalchemy==2.0.41",
     "uvicorn==0.34.0",
 ]
 

@@ -1,0 +1,5 @@
+version: location_aliases@1
+aliases:
+  austin, tx: austin, texas, us
+  austin tx us: austin, texas, us
+  austin, texas, us: austin, texas, us

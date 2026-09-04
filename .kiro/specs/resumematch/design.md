@@ -1527,7 +1527,7 @@ classify(unit, headings):
 
 Unmatched units are `preferred`, never `required` (c5), which again biases away from false `skip`. `contextual` requirements are excluded from match scoring and Hard_Requirement evaluation (c4). Requirements whose skill resolves to `unmapped` are excluded from Hard_Requirement evaluation but retained for display (c6). Every requirement records exact `[start, end)` offsets into the raw description such that slicing reproduces the phrase (c7), and carries `pattern_set_version` and `delimitation_version` (c8).
 
-RM-REQX-002: experience ranges via a fixed pattern set (`(\d+)\s*[-–to]+\s*(\d+)\+?\s*(years|yrs)`, `(\d+)\+\s*(years|yrs)`, `at least (\d+)`, `minimum of (\d+)`); conflicting figures keep the lowest minimum and set a `conflicting` flag (c5); seniority from `config/seniority_mapping.yaml` over title tokens and stated experience, defaulting to `unknown` (c3, c6).
+RM-REQX-002: experience ranges via a fixed pattern set (`(\d+)\s*[-–to]+\s*(\d+)\+?\s*(years|yrs)`, `(\d+)\+\s*(years|yrs)`, `at least (\d+)`, `minimum of (\d+)`); conflicting figures keep the lowest minimum and set a `conflicting` flag (c5). Seniority derives deterministically from the versioned `config/seniority_mapping.yaml`: strong explicit title tokens take precedence, then configured stated-experience thresholds, then `unknown` (c3, c6). The config records title-token mappings, minimum- and maximum-only experience thresholds, and its mapping version. No LLM participates; unresolved values remain `unknown` rather than guessed.
 
 ### `matching` — Matching_Engine and Classifier
 
@@ -1542,6 +1542,32 @@ class DimensionScorer(Protocol):
     def score(self, profile: CandidateProfile, posting: JobPosting,
               evidence: EvidenceIndex, cfg: MatchConfig) -> DimensionScore: ...
 ```
+
+`config/matching_contract.yaml` at version `matching_contract@1` defines the
+closed, generic v1 `DimensionId` set: `skills`, `experience`, `role_similarity`,
+`seniority`, `education`, `location_workmode`, and `domain_signals`. The loader
+rejects an unknown, omitted, or extra dimension. `EnablementVerdict` is frozen and
+contains the dimension, an enabled flag, and a closed reason; `DimensionScore` is
+frozen, forbids extra fields, and records only Decimal normalized score, weight,
+and weighted score values. Disabled dimensions carry null scores. These contracts
+and their enablement reasons are deterministic, generic, and never provider- or
+domain-branch-derived. `matching_contract_version` is recorded in `VersionStamp`
+on responses containing matching scores.
+
+`DimensionScore.score` and `DimensionScore.weighted_score` are internal normalized
+`Decimal` values in `[0, 1]`; an internal scorer never returns a `0–100` value.
+At the reporting, API, or presentation boundary, an enabled score is rendered as
+`quantize_half_up(score * Decimal("100"))`; a disabled score remains null. This
+preserves RM-MATCH-001's externally reported integral `0–100` convention without
+introducing floats or a competing internal score scale.
+
+`EvidenceIndex` is a frozen structured-reference index: it maps generic dimensions
+and requirement IDs to sorted `EvidenceRef` values containing only an item ID, item
+type, evidence level, and dimension ID. It never receives raw resume text or computes
+evidence. `MatchConfig` is a frozen loaded configuration comprising the matching
+contract version, the validated Decimal dimension weights, enabled generic dimensions,
+and an enablement-rules version. Both are matching-layer contracts, deterministic, and
+provider-free.
 
 `config/match_weights.yaml` (version `match_weights@1`) carries the AS-07 defaults 30/20/15/10/10/10/5. Loader rejects a set that does not sum to 100 ± 0.01, contains a weight outside `[0, 100]`, or omits/duplicates a dimension (RM-MATCH-001 c2).
 
@@ -1558,6 +1584,17 @@ Enablement (c9) is per-dimension and data-driven:
 | `domain_signals` | posting domain derivable under c11 |
 
 Weight redistribution when a dimension is excluded (RM-REQX-003 c2): remaining weights are scaled by `100 / sum(remaining)` using `Decimal`, and the effective weights recorded in the Match_Result sum to 100 ± 0.1 (RM-MATCH-001 c8). When no dimension is enabled the overall score is `None`, not 0.
+
+`config/dimension_match_scoring.yaml` at version `dimension_match_scoring@1`
+defines the normalized Decimal semantics for seniority, education, and
+location/work-mode. Seniority uses the configured seniority order and configured
+absolute-distance values. Education combines configured degree and field scores
+with validated Decimal weights; related fields are exact configured folded entries
+only. Location/work-mode combines configured structured work-mode compatibility and
+city/region/country components parsed from normalized structured locations. Unknown,
+absent, or unresolved inputs score `0`; no scorer performs free-text inference,
+geocoding, web lookup, or provider call.
+The dimension-match-scoring version is recorded in `VersionStamp` on scored responses.
 
 `config/role_family_equivalence.yaml` (D-26, RM-MATCH-001 c10) — ordered pairs `(candidate_family, posting_family)`, absent pair scores 0:
 
@@ -1605,6 +1642,18 @@ pair_scores:                # (candidate_domain, posting_domain) -> 0..100; abse
 ```
 
 The `by_role_family_fallback` layer is the design's answer to AS-15's unmapped-pair concern: an unlisted company still derives a domain from its role family, so the absent-pair-scores-0 rule bites only when the role family is also `unknown`. This lowers the unmapped rate without inventing company knowledge.
+
+`config/candidate_context_resolver.yaml` at version
+`candidate_context_resolver@1` is the only source for candidate-side matching
+context. It maps target role IDs to configured role-family identifiers, folded
+prior-role-title phrases to those families, target-domain IDs to configured
+scoring-domain identifiers, and folded employer tokens to scoring domains. Prior
+titles and posting normalized titles resolve only on an exact configured folded
+phrase. Employer tokens resolve only as configured contiguous folded token phrases;
+there is no fuzzy matching, external enrichment, web lookup, or provider call. The
+Role Similarity and Domain Signals scorers take the highest configured pair score
+among resolved target and prior facts; any absent or unknown mapping contributes `0`.
+The resolver version is recorded in `VersionStamp`.
 
 #### Total_Relevant_Experience (RM-MATCH-002 c8, D-24) — resolves the design-phase item
 
@@ -1818,6 +1867,9 @@ class VersionStamp(BaseModel):
     pattern_set_version: str | None
     delimitation_version: str | None
     relevance_rule_version: str | None
+    matching_contract_version: str | None
+    candidate_context_resolver_version: str | None
+    dimension_match_scoring_version: str | None
 ```
 
 Every response containing a score carries a `VersionStamp`. This is what makes "reproduce the result I acted on" a real operation rather than a promise.
@@ -2132,7 +2184,8 @@ tables (all Public_Job_Data):
                       normalized_location, raw_location, work_mode, employment_type,
                       min_experience_years, max_experience_years, experience_conflict,
                       posted_at, ingested_at, duplicate_group_id, is_primary_in_group,
-                      pattern_set_version, delimitation_version)
+                      pattern_set_version, delimitation_version, company_fold, title_fold,
+                      location_fold)
   job_requirement    (requirement_id PK, internal_id FK, classification, low_confidence,
                       canonical_skill_id, unit_text, start_offset, end_offset, unit_id,
                       excluded_category)
@@ -2143,6 +2196,11 @@ tables (all Public_Job_Data):
   UNIQUE (source_id, source_external_id)        -- RM-JOB-005 c1
   INDEX  (company_fold, title_fold, location_fold)  -- RM-JOB-005 c2
 ```
+
+`company_fold`, `title_fold`, and `location_fold` are deterministic folds of the
+public company, title, and location fields. They are Public_Job_Data only, never
+candidate-derived, and are stored solely to support duplicate detection and its
+index.
 
 **How the separation is enforced rather than intended (D-15):**
 

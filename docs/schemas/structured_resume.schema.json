@@ -1,0 +1,784 @@
+{
+  "$defs": {
+    "AchievementItem": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Confidence Inputs",
+          "type": "array"
+        },
+        "extraction_confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Extraction Confidence"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "extracted",
+            "user_provided"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_text": {
+          "title": "Source Text",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "origin",
+        "extraction_confidence",
+        "confidence_inputs",
+        "provenance",
+        "source_text",
+        "text"
+      ],
+      "title": "AchievementItem",
+      "type": "object"
+    },
+    "CertificationItem": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Confidence Inputs",
+          "type": "array"
+        },
+        "extraction_confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Extraction Confidence"
+        },
+        "issued": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/YearMonth"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "issuer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Issuer"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Name"
+        },
+        "origin": {
+          "enum": [
+            "extracted",
+            "user_provided"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_text": {
+          "title": "Source Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "origin",
+        "extraction_confidence",
+        "confidence_inputs",
+        "provenance",
+        "source_text",
+        "name",
+        "issuer",
+        "issued"
+      ],
+      "title": "CertificationItem",
+      "type": "object"
+    },
+    "DegreeLevel": {
+      "enum": [
+        "none",
+        "associate",
+        "bachelors",
+        "masters",
+        "doctorate"
+      ],
+      "title": "DegreeLevel",
+      "type": "string"
+    },
+    "EducationItem": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Confidence Inputs",
+          "type": "array"
+        },
+        "coursework": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Coursework",
+          "type": "array"
+        },
+        "degree_level": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DegreeLevel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/YearMonth"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extraction_confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Extraction Confidence"
+        },
+        "field_of_study": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Field Of Study"
+        },
+        "institution": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Institution"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "extracted",
+            "user_provided"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_text": {
+          "title": "Source Text",
+          "type": "string"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/YearMonth"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "item_id",
+        "origin",
+        "extraction_confidence",
+        "confidence_inputs",
+        "provenance",
+        "source_text",
+        "institution",
+        "degree_level",
+        "field_of_study",
+        "start_date",
+        "end_date",
+        "coursework"
+      ],
+      "title": "EducationItem",
+      "type": "object"
+    },
+    "ExperienceItem": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Confidence Inputs",
+          "type": "array"
+        },
+        "date_conflict": {
+          "title": "Date Conflict",
+          "type": "boolean"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "duration_months": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Duration Months"
+        },
+        "employer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Employer"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/YearMonth"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extraction_confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Extraction Confidence"
+        },
+        "is_present": {
+          "title": "Is Present",
+          "type": "boolean"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "extracted",
+            "user_provided"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_text": {
+          "title": "Source Text",
+          "type": "string"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/YearMonth"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        }
+      },
+      "required": [
+        "item_id",
+        "origin",
+        "extraction_confidence",
+        "confidence_inputs",
+        "provenance",
+        "source_text",
+        "employer",
+        "title",
+        "start_date",
+        "end_date",
+        "is_present",
+        "duration_months",
+        "description",
+        "date_conflict"
+      ],
+      "title": "ExperienceItem",
+      "type": "object"
+    },
+    "ProjectItem": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Confidence Inputs",
+          "type": "array"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Description"
+        },
+        "extraction_confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Extraction Confidence"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Name"
+        },
+        "origin": {
+          "enum": [
+            "extracted",
+            "user_provided"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_text": {
+          "title": "Source Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "origin",
+        "extraction_confidence",
+        "confidence_inputs",
+        "provenance",
+        "source_text",
+        "name",
+        "description"
+      ],
+      "title": "ProjectItem",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "block_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Block Ids",
+          "type": "array"
+        },
+        "end_offset": {
+          "title": "End Offset",
+          "type": "integer"
+        },
+        "section_id": {
+          "title": "Section Id",
+          "type": "string"
+        },
+        "start_offset": {
+          "title": "Start Offset",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "section_id",
+        "block_ids",
+        "start_offset",
+        "end_offset"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "SkillItem": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_skill_id": {
+          "title": "Canonical Skill Id",
+          "type": "string"
+        },
+        "confidence_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Confidence Inputs",
+          "type": "array"
+        },
+        "extraction_confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Extraction Confidence"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "extracted",
+            "user_provided"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_text": {
+          "title": "Source Text",
+          "type": "string"
+        },
+        "surface": {
+          "title": "Surface",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "origin",
+        "extraction_confidence",
+        "confidence_inputs",
+        "provenance",
+        "source_text",
+        "surface",
+        "canonical_skill_id"
+      ],
+      "title": "SkillItem",
+      "type": "object"
+    },
+    "UnclassifiedItem": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Confidence Inputs",
+          "type": "array"
+        },
+        "extraction_confidence": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Extraction Confidence"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "extracted",
+            "user_provided"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_text": {
+          "title": "Source Text",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "origin",
+        "extraction_confidence",
+        "confidence_inputs",
+        "provenance",
+        "source_text",
+        "text"
+      ],
+      "title": "UnclassifiedItem",
+      "type": "object"
+    },
+    "YearMonth": {
+      "additionalProperties": false,
+      "properties": {
+        "month": {
+          "title": "Month",
+          "type": "integer"
+        },
+        "year": {
+          "title": "Year",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "year",
+        "month"
+      ],
+      "title": "YearMonth",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "achievements": {
+      "items": {
+        "$ref": "#/$defs/AchievementItem"
+      },
+      "title": "Achievements",
+      "type": "array"
+    },
+    "certifications": {
+      "items": {
+        "$ref": "#/$defs/CertificationItem"
+      },
+      "title": "Certifications",
+      "type": "array"
+    },
+    "education": {
+      "items": {
+        "$ref": "#/$defs/EducationItem"
+      },
+      "title": "Education",
+      "type": "array"
+    },
+    "experience": {
+      "items": {
+        "$ref": "#/$defs/ExperienceItem"
+      },
+      "title": "Experience",
+      "type": "array"
+    },
+    "projects": {
+      "items": {
+        "$ref": "#/$defs/ProjectItem"
+      },
+      "title": "Projects",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "structured_resume/1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "skills": {
+      "items": {
+        "$ref": "#/$defs/SkillItem"
+      },
+      "title": "Skills",
+      "type": "array"
+    },
+    "summary": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Summary"
+    },
+    "unclassified": {
+      "items": {
+        "$ref": "#/$defs/UnclassifiedItem"
+      },
+      "title": "Unclassified",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "summary",
+    "skills",
+    "experience",
+    "education",
+    "projects",
+    "certifications",
+    "achievements",
+    "unclassified"
+  ],
+  "title": "StructuredResume",
+  "type": "object"
+}

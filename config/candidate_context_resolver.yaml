@@ -1,0 +1,77 @@
+resolver_version: candidate_context_resolver@1
+unknown: unknown
+target_role_families:
+  backend_engineer: software_engineering
+  financial_analyst: finance
+  embedded_firmware_engineer: embedded_firmware
+  performance_marketing_analyst: marketing
+  supply_chain_analyst: supply_chain_ops
+target_domain_mappings:
+  software_engineering: software_saas
+  finance: financial_services
+  embedded_firmware: semiconductor_hardware
+  marketing: consumer_retail
+  supply_chain_ops: industrial_logistics
+prior_title_role_families:
+  software_engineering:
+    - backend engineer
+    - software engineer
+    - python developer
+    - java developer
+    - full stack developer
+    - web developer
+  finance:
+    - financial analyst
+    - audit associate
+    - fund accountant
+    - investment analyst
+    - research analyst
+    - equity research analyst
+  embedded_firmware:
+    - embedded engineer
+    - firmware engineer
+    - hardware engineer
+    - iot engineer
+  marketing:
+    - marketing analyst
+    - performance marketing analyst
+    - digital marketing analyst
+    - growth analyst
+  supply_chain_ops:
+    - operations analyst
+    - supply chain analyst
+    - procurement analyst
+    - logistics analyst
+employer_domain_mappings:
+  financial_services:
+    - bank
+    - capital
+    - asset management
+    - wealth
+    - securities
+    - insurance
+    - audit
+    - accounting
+  software_saas:
+    - software
+    - technologies
+    - tech
+    - systems
+    - solutions
+  semiconductor_hardware:
+    - semiconductor
+    - electronics
+    - hardware
+    - embedded
+    - iot
+  consumer_retail:
+    - media
+    - advertising
+    - marketing
+    - growth
+  industrial_logistics:
+    - logistics
+    - supply chain
+    - procurement
+    - manufacturing
+    - operations

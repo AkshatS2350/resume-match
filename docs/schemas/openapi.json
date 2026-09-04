@@ -1,6 +1,47 @@
 {
   "components": {
     "schemas": {
+      "Body_upload_resume_api_v1_sessions_resume_post": {
+        "properties": {
+          "file": {
+            "format": "binary",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_resume_api_v1_sessions_resume_post",
+        "type": "object"
+      },
+      "ExtractionResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "extraction_ok": {
+            "title": "Extraction Ok",
+            "type": "boolean"
+          },
+          "page_count": {
+            "title": "Page Count",
+            "type": "integer"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "extraction_ok",
+          "page_count"
+        ],
+        "title": "ExtractionResponse",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -124,6 +165,26 @@
         "summary": "Health"
       }
     },
+    "/api/v1/meta/sources": {
+      "get": {
+        "description": "Disclose configured source documentation before an ingestion run exists.",
+        "operationId": "sources_api_v1_meta_sources_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Sources Api V1 Meta Sources Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Sources"
+      }
+    },
     "/api/v1/sessions": {
       "delete": {
         "operationId": "delete_session_api_v1_sessions_delete",
@@ -184,6 +245,62 @@
           }
         },
         "summary": "Create Session"
+      }
+    },
+    "/api/v1/sessions/resume": {
+      "post": {
+        "operationId": "upload_resume_api_v1_sessions_resume_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_resume_api_v1_sessions_resume_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Resume"
       }
     }
   }

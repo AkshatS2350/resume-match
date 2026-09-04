@@ -1,0 +1,40 @@
+dimension_match_scoring_version: dimension_match_scoring@1
+seniority:
+  exact_match: "1.00"
+  adjacent_level: "0.70"
+  two_levels_apart: "0.40"
+  more_than_two_levels_apart: "0.00"
+  unknown_or_absent: "0.00"
+education:
+  degree_level:
+    exact_or_higher: "1.00"
+    one_level_below: "0.60"
+    more_than_one_level_below: "0.00"
+    unknown_or_absent: "0.00"
+  field:
+    exact_field_match: "1.00"
+    configured_related_field_match: "0.60"
+    no_match: "0.00"
+    unknown_or_absent: "0.00"
+  weights: {degree_level: "0.70", field: "0.30"}
+  related_fields:
+    computer science: [information technology, software engineering, computer engineering]
+    finance: [accounting, economics, business]
+    marketing: [business, communications]
+    supply chain: [operations, logistics, industrial engineering]
+    electronics: [electrical engineering, electronics and communication, embedded systems]
+location_work_mode:
+  work_mode:
+    exact_match: "1.00"
+    remote_candidate_for_hybrid_job: "0.80"
+    hybrid_candidate_for_onsite_job: "0.60"
+    remote_candidate_for_onsite_job: "0.30"
+    incompatible: "0.00"
+    unknown_or_absent: "0.00"
+  location:
+    exact_city_match: "1.00"
+    same_region_match: "0.70"
+    same_country_match: "0.40"
+    no_match: "0.00"
+    unknown_or_absent: "0.00"
+  weights: {work_mode: "0.60", location: "0.40"}

@@ -18,6 +18,9 @@ class VersionStamp(BaseModel):
     pattern_set_version: str | None
     delimitation_version: str | None
     relevance_rule_version: str | None
+    matching_contract_version: str | None = None
+    candidate_context_resolver_version: str | None = None
+    dimension_match_scoring_version: str | None = None
 
 
 def version_stamp(**values: str | None) -> VersionStamp:

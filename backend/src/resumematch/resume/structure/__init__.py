@@ -1,0 +1,1 @@
+"""Deterministic resume-structuring components."""

@@ -1,0 +1,423 @@
+{
+  "$defs": {
+    "DegreeLevel": {
+      "enum": [
+        "none",
+        "associate",
+        "bachelors",
+        "masters",
+        "doctorate"
+      ],
+      "title": "DegreeLevel",
+      "type": "string"
+    },
+    "EducationRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "degree_level": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DegreeLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "field_of_study": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field Of Study"
+        },
+        "requirement_kind": {
+          "enum": [
+            "required",
+            "preferred"
+          ],
+          "title": "Requirement Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_kind"
+      ],
+      "title": "EducationRequirement",
+      "type": "object"
+    },
+    "EmploymentType": {
+      "enum": [
+        "full_time",
+        "part_time",
+        "contract",
+        "internship",
+        "temporary",
+        "unknown"
+      ],
+      "title": "EmploymentType",
+      "type": "string"
+    },
+    "ExtractedRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_skill_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Canonical Skill Id"
+        },
+        "classification": {
+          "enum": [
+            "required",
+            "preferred",
+            "contextual"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "delimitation_version": {
+          "title": "Delimitation Version",
+          "type": "string"
+        },
+        "end_offset": {
+          "title": "End Offset",
+          "type": "integer"
+        },
+        "excluded_category": {
+          "anyOf": [
+            {
+              "enum": [
+                "work_authorization",
+                "visa_status",
+                "sponsorship",
+                "security_clearance_citizenship"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Excluded Category"
+        },
+        "low_confidence": {
+          "title": "Low Confidence",
+          "type": "boolean"
+        },
+        "pattern_set_version": {
+          "title": "Pattern Set Version",
+          "type": "string"
+        },
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "start_offset": {
+          "title": "Start Offset",
+          "type": "integer"
+        },
+        "unit_id": {
+          "title": "Unit Id",
+          "type": "string"
+        },
+        "unit_text": {
+          "title": "Unit Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "classification",
+        "low_confidence",
+        "canonical_skill_id",
+        "unit_text",
+        "start_offset",
+        "end_offset",
+        "unit_id",
+        "excluded_category",
+        "pattern_set_version",
+        "delimitation_version"
+      ],
+      "title": "ExtractedRequirement",
+      "type": "object"
+    },
+    "SeniorityId": {
+      "enum": [
+        "intern",
+        "entry",
+        "mid",
+        "senior",
+        "lead",
+        "manager",
+        "director",
+        "executive",
+        "unknown"
+      ],
+      "title": "SeniorityId",
+      "type": "string"
+    },
+    "WorkMode": {
+      "enum": [
+        "onsite",
+        "hybrid",
+        "remote",
+        "unknown"
+      ],
+      "title": "WorkMode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A stored public posting and its cached, derived requirement set.",
+  "properties": {
+    "apply_url": {
+      "title": "Apply Url",
+      "type": "string"
+    },
+    "certification_requirements": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Certification Requirements",
+      "type": "array"
+    },
+    "company": {
+      "title": "Company",
+      "type": "string"
+    },
+    "duplicate_group_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Duplicate Group Id"
+    },
+    "education_requirements": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EducationRequirement"
+      },
+      "title": "Education Requirements",
+      "type": "array"
+    },
+    "employment_type": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EmploymentType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "experience_conflict": {
+      "default": false,
+      "title": "Experience Conflict",
+      "type": "boolean"
+    },
+    "ingested_at": {
+      "format": "date-time",
+      "title": "Ingested At",
+      "type": "string"
+    },
+    "internal_id": {
+      "title": "Internal Id",
+      "type": "string"
+    },
+    "is_primary_in_group": {
+      "default": false,
+      "title": "Is Primary In Group",
+      "type": "boolean"
+    },
+    "max_experience_years": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Experience Years"
+    },
+    "min_experience_years": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Min Experience Years"
+    },
+    "normalized_location": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Normalized Location"
+    },
+    "normalized_title": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Normalized Title"
+    },
+    "posted_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Posted At"
+    },
+    "preferred_skills": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Preferred Skills",
+      "type": "array"
+    },
+    "raw_description": {
+      "title": "Raw Description",
+      "type": "string"
+    },
+    "raw_location": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Raw Location"
+    },
+    "raw_title": {
+      "title": "Raw Title",
+      "type": "string"
+    },
+    "required_skills": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Skills",
+      "type": "array"
+    },
+    "requirements": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ExtractedRequirement"
+      },
+      "title": "Requirements",
+      "type": "array"
+    },
+    "role_family": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Role Family"
+    },
+    "schema_version": {
+      "const": "job_posting/1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seniority": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SeniorityId"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_external_id": {
+      "title": "Source External Id",
+      "type": "string"
+    },
+    "source_id": {
+      "title": "Source Id",
+      "type": "string"
+    },
+    "work_mode": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WorkMode"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "schema_version",
+    "internal_id",
+    "source_id",
+    "source_external_id",
+    "company",
+    "raw_title",
+    "raw_description",
+    "apply_url",
+    "ingested_at"
+  ],
+  "title": "JobPosting",
+  "type": "object"
+}

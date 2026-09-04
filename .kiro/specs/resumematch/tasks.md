@@ -448,14 +448,14 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-PARSE-005 c1, c2, c4; RM-REV-001 c4, c5_ · _Design: Candidate side_ · _Property: 2, 4_
   - Done when: a validator rejects `provenance=None` when `origin == "extracted"`; a validator rejects an `extraction_confidence` outside `[0, 1]` or with more than two decimal places; `extraction_confidence` is typed `Decimal` and a test asserts a `float` input is rejected or exactly quantized, never silently widened.
 
-- [ ] 11.2 [P0] Define the seven item types and the `unclassified` item
+- [x] 11.2 [P0] Define the seven item types and the `unclassified` item
   - Files: `backend/src/resumematch/core/schemas/candidate.py`, `backend/tests/properties/test_candidate_items.py`
   - Work: `SkillItem`, `ExperienceItem`, `EducationItem`, `ProjectItem`, `CertificationItem`, `AchievementItem`, `UnclassifiedItem`, with exactly the fields listed in the design. `YearMonth` and the `DegreeLevel`, `WorkMode`, `SeniorityId`, `EmploymentType` enums.
   - Depends on: 11.1
   - _Requirements: RM-PARSE-003 c2, c3, c4; RM-PARSE-004 c1_ · _Design: Candidate side_ · _Property: 2_
   - Done when: every model is `frozen=True, extra="forbid"`; a Hypothesis round-trip test passes for each of the seven types; a test asserts `ExperienceItem` carries both `duration_months` and `date_conflict`.
 
-- [ ] 11.3 [P0] Define `StructuredResume`, `TargetConstraints`, and `CandidateProfile`
+- [x] 11.3 [P0] Define `StructuredResume`, `TargetConstraints`, and `CandidateProfile`
   - Files: `backend/src/resumematch/core/schemas/candidate.py`, `backend/tests/properties/test_profile_roundtrip.py`
   - Work: `StructuredResume` with `schema_version: Literal["structured_resume/1"]` and the eight collections (seven sections plus `unclassified`), empty tuples where a section is absent. `TargetConstraints`. `CandidateProfile` with `schema_version`, `profile_revision`, `session_start_date`, `resume`, `target`, `confirmed`. Export both to JSON Schema and regenerate the TypeScript types.
   - Depends on: 11.2, 4.6
@@ -471,7 +471,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-PARSE-003 c2, c4_ · _Design: Resume_Structurer_ · _Property: 6_
   - Done when: the missing-sections, duplicate-headings, and unusual-headings fixtures each produce a `StructuredResume` in which every source `block_id` appears in exactly one section counting `unclassified`; a test asserts zero blocks are dropped for all ten text-bearing fixtures.
 
-- [ ] 12.2 [P0] Implement experience date-range parsing and duration computation
+- [x] 12.2 [P0] Implement experience date-range parsing and duration computation
   - Files: `backend/src/resumematch/resume/structure/dates.py`, `backend/tests/unit/resume/test_date_parsing.py`
   - Work: parse recognizable ranges into `start_date`, `end_date` or `is_present`, and `duration_months`. Set `date_conflict` where a range is inverted or two ranges in one item disagree. Month-granularity arithmetic only; no wall-clock — `present` resolves against `CandidateProfile.session_start_date` supplied as data.
   - Depends on: 11.2
@@ -601,21 +601,21 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-PRIV-002 c1, c2, c4_ · _Design: D-37_
   - Done when: a test measures per-category recall for the mechanism alone over `fixtures/pii/` and records it; every reported span's slice equals the matched text; a test asserts a confidence outside `[0.00, 1.00]` is rejected at construction.
 
-- [ ] 16.5 [P0] Implement the NER/PII-library detection mechanism and combine the two
+- [x] 16.5 [P0] Implement the NER/PII-library detection mechanism and combine the two
   - Files: `backend/src/resumematch/privacy/detectors/ner.py`, `backend/src/resumematch/privacy/detector.py`, `backend/tests/unit/privacy/test_detector_combination.py`
   - Work: wrap the mechanism chosen in 15.2 as the second independent detector. `PII_Detector` runs **every** mechanism over **every** candidate span rather than stopping at the first finding, marks a span for removal when either identifies it, and sets the span's classification confidence to the maximum reported by the identifying mechanisms.
   - Depends on: 16.4, 15.2
   - _Requirements: RM-PRIV-002 c2, c4_ · _Design: D-37_
   - Done when: a test with a span identified by both mechanisms at 0.70 and 0.91 asserts the retained confidence is 0.91; a test with instrumented mechanisms asserts both were invoked for a span the first one already matched; a test asserts the detector reports its `detector_versions` tuple.
 
-- [ ] 16.6 [P0] Implement span overlap resolution
+- [x] 16.6 [P0] Implement span overlap resolution
   - Files: `backend/src/resumematch/privacy/spans.py`, `backend/tests/properties/test_span_resolution.py`, `docs/decisions/0003-pii-overlap-rule.md`
   - Work: after Retain-default precedence, group directly or transitively overlapping removal-subject spans; replace each group with one span covering its complete union. Select one category deterministically by highest confidence, then lexicographically ascending category identifier, lower start offset, and greater end offset. Emit pairwise non-overlapping resolved spans and prefer bounded over-redaction to loss of detected PII. Record the approved rule in `docs/decisions/0003-pii-overlap-rule.md`.
   - Depends on: 16.5
   - _Requirements: RM-PRIV-002 c1_ · _Design: PII overlap resolution · _Property: 20_
   - Done when: a Hypothesis test over generated overlapping span sets asserts resolved spans are pairwise disjoint, each carries exactly one category and a confidence in `[0.00, 1.00]`, and every character of every removal-subject input span is covered by exactly one resolved span; tests cover direct and transitive overlaps and equal-confidence ties; the ADR names the approved union rule and `RM-PRIV-002 c1`.
 
-- [ ] 16.7 [P0] Implement the fail-closed detector-unavailable path
+- [x] 16.7 [P0] Implement the fail-closed detector-unavailable path
   - Files: `backend/src/resumematch/privacy/detector.py`, `backend/tests/privacy/test_detector_unavailable.py`
   - Work: if either mechanism is unavailable or raises, produce no `Sanitized_Resume`, write no sanitization record, return `PII_DETECTION_UNAVAILABLE` (503, retryable) to the caller, and leave Session state unmodified. There is no configuration that turns this into a partial sanitization.
   - Depends on: 16.5, 3.8
@@ -624,7 +624,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 17. Sanitization
 
-- [ ] 17.1 [P0] Implement retention precedence for Retain-default fields
+- [x] 17.1 [P0] Implement retention precedence for Retain-default fields
   - Files: `backend/src/resumematch/privacy/sanitizer.py`, `backend/tests/unit/privacy/test_retention_precedence.py`
   - Work: retain, without redaction, the values of every Retain-default field, applying that retention in precedence over the detection and confidence-floor rules — so an employer name of the form `Morgan Stanley` survives even when a mechanism reports it as a person name. Where a Remove-default span is detected **inside** a retained project description, replace that span and retain the remainder.
   - Depends on: 16.6, 16.3
@@ -721,7 +721,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 20. Privacy build gates
 
-- [ ] 20.1 [P0] Implement `tools/eval_pii.py` and the `pii-gates` CI job
+- [x] 20.1 [P0] Implement `tools/eval_pii.py` and the `pii-gates` CI job
   - Files: `tools/eval_pii.py`, `.github/workflows/ci.yml`
   - Work: evaluate per-category recall and precision over `fixtures/pii/` using the requirement's exact definitions. Fail the build when per-category recall for any category falls below 0.95, when any category has fewer than 20 labeled instances, or when per-category precision falls more than 0.05 below `fixtures/pii/previous_release_figures.json`. Report the affected category and the failing figure.
   - Depends on: 16.1, 16.5, 16.6
@@ -810,14 +810,14 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-EVID-001 c3, c4_ · _Design: `quantified_impact`_ · _Property: 11_
   - Done when: a Hypothesis test asserts the flag is true exactly under the rule and its exclusions; unit tests assert `reduced cost by 40%` is true, `Python 3.11` is false, `graduated 2019` is false, `Jan 2020` in a date field is false, and `handled 12 000 orders` is true; a test asserts the flag's value never appears as an input to the level computation.
 
-- [ ] 23.3 [P0] Implement per-item Evidence_Level assignment
+- [x] 23.3 [P0] Implement per-item Evidence_Level assignment
   - Files: `backend/src/resumematch/rubric/evidence.py`, `backend/tests/unit/rubric/test_level_for_item.py`
   - Work: the design's `level_for_item` — Level 3 only when the employer has at least two non-whitespace characters, both dates resolve (`present` against `session_start_date`), the span is at least one calendar month, the mention is in the item's title or description, and the item resolves to at most 20 distinct canonical skills; otherwise Level 2 with the unmet condition or demotion reason recorded. Level 2 for `projects`, `certifications`, `education`, `coursework`; Level 1 for `skills`, `summary`, and any unnamed section. Employer, institution, and certification-issuer fields are excluded from skill matching. Proficiency words are stripped before determination.
   - Depends on: 22.3, 23.1, 11.2
   - _Requirements: RM-EVID-001 c1, c7, c8, c9, c10_ · _Design: `level_for_item`_ · _Property: 9, 10_
   - Done when: unit tests cover each of the five Level 3 conditions failing individually and assert Level 2 with the specific `unmet_level3_condition` recorded; a test with 21 distinct skills in one experience item asserts Level 2 for every skill with the demotion reason recorded on each; a test asserts an employer literally named `Oracle` does not credit the `oracle` skill; a test asserts deleting `expert` from an item's text leaves the level unchanged.
 
-- [ ] 23.4 [P0] Implement `Evidence_Assigner` — totality, maximality, and the evidence record
+- [x] 23.4 [P0] Implement `Evidence_Assigner` — totality, maximality, and the evidence record
   - Files: `backend/src/resumematch/rubric/evidence.py`, `backend/tests/properties/test_evidence_assigner.py`
   - Work: `assign(profile, required_skill_ids, session_start_date) -> tuple[EvidenceAssignment, ...]`. Assign exactly one level in `{0,1,2,3}` to every skill in the union of profile-resolved and referenced skills; Level 0 where no item supports it; evaluate the table once per supporting item and take the numerically highest. Record `supporting_items`, `determining_item_id`, `quantity_match`, `demotion_reason`, `unmet_level3_condition`. Iterate over sorted item identifiers. No provider call.
   - Depends on: 23.3, 23.2
@@ -1089,7 +1089,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-REQX-001 c7, c8; RM-MATCH-002 c6_ · _Design: Job side_ · _Property: 2_
   - Done when: a round-trip test passes; a validator rejects `end_offset <= start_offset`; a test asserts `excluded_category` accepts only the four named values or null.
 
-- [ ] 34.2 [P0] Define the `Job_Posting` schema
+- [x] 34.2 [P0] Define the `Job_Posting` schema
   - Files: `backend/src/resumematch/core/schemas/job.py`, `backend/tests/properties/test_job_posting.py`
   - Work: frozen model with exactly the design's fields. Required: `internal_id`, `source_id`, `source_external_id`, `company`, `raw_title`, `raw_description`, `apply_url`. Everything else optional. `raw_description` stored separately from the derived requirement fields. `requirements` holds the requirement set cached at ingestion. No field is candidate-derived.
   - Depends on: 34.1
@@ -1098,7 +1098,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 35. Job source interface and the Fixture adapter
 
-- [ ] 35.1 [P0] Define the `Job_Source` interface and its envelope models
+- [x] 35.1 [P0] Define the `Job_Source` interface and its envelope models
   - Files: `backend/src/resumematch/job/source_api.py`, `backend/tests/unit/job/test_source_api.py`
   - Work: `SourceCapabilities` (`source_id`, `universal_search`, `requires_registry_entry`, `supports_incremental`, `is_network_source`, `documentation_url`, `rate_limit_note`), `FetchRequest`, `RawPosting`, `SourceFailure`, `FetchResult`, and the `Job_Source` protocol with `capabilities()`, `fetch()`, and `map() -> JobPostingDraft`. `map` returns an unvalidated draft so that per-posting validation failure is the Job_Normalizer's decision, not an adapter exception.
   - Depends on: 34.2
@@ -1112,14 +1112,14 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-TEST-002 c4; RM-JOB-002 c3_ · _Design: Fixture adapter on-disk format; D-38_
   - Done when: the manifest lists all six files in a fixed order with notes on the duplicate pair and the malformed posting; a test asserts every posting file's `retrieved_at` and `posted_at` are literal timestamps; a test asserts the malformed posting is present and does not parse as a valid draft.
 
-- [ ] 35.3 [P0] Implement the Fixture `Job_Source_Adapter`
+- [x] 35.3 [P0] Implement the Fixture `Job_Source_Adapter`
   - Files: `backend/src/resumematch/job/adapters/fixture.py`, `backend/tests/unit/job/test_fixture_adapter.py`
   - Work: read the manifest and iterate `manifest.postings` in file order. Never call `os.listdir`, `glob`, `iterdir`, or `scandir`. `is_network_source = False`; no transport is constructed.
   - Depends on: 35.2, 35.1, 2.6
   - _Requirements: RM-JOB-002 c3_ · _Design: D-38; Determinism — fixture load order_
   - Done when: `tools/check_determinism.py` reports no directory-listing call in the module; a test asserts the returned posting order equals the manifest order and is unchanged when the files are re-created in a different filesystem order; a test with the `no_network` fixture asserts the adapter completes with no connection attempt.
 
-- [ ] 35.4 [P0] Prove downstream source independence
+- [x] 35.4 [P0] Prove downstream source independence
   - Files: `backend/tests/properties/test_source_independence.py`
   - Work: assert `matching` imports `job` only for `JobPosting` and never an adapter module, and that registering a new adapter requires no change to `Job_Normalizer`, `Requirement_Extractor`, `Matching_Engine`, or `Classifier` source.
   - Depends on: 35.3, 2.1
@@ -1128,28 +1128,28 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 36. Job normalization
 
-- [ ] 36.1 [P0] Implement the deterministic company, title, and location folds
+- [x] 36.1 [P0] Implement the deterministic company, title, and location folds
   - Files: `backend/src/resumematch/job/normalizer.py`, `config/location_aliases.yaml`, `backend/tests/unit/job/test_folds.py`
   - Work: company fold — casefold, strip the legal suffixes the design lists, collapse punctuation. Title fold — the same folding plus extraction of seniority tokens into a separate field. Location fold — a `city, region, country` triple against a fixed alias table for the metros present in the fixture and seed corpora, with explicit `remote` handling.
   - Depends on: 34.2, 3.3
   - _Requirements: RM-JOB-001 c2_ · _Design: Job_Normalizer_
   - Done when: table tests assert `Northwind Systems, Inc.` and `northwind systems` fold identically; assert `Senior Backend Engineer` yields title fold `backend engineer` with the seniority token separated; assert `Austin, TX` and `Austin, Texas, US` fold identically.
 
-- [ ] 36.2 [P0] Implement per-posting validation failure isolation
+- [x] 36.2 [P0] Implement per-posting validation failure isolation
   - Files: `backend/src/resumematch/job/normalizer.py`, `backend/tests/properties/test_posting_validation_isolation.py`
   - Work: when an individual raw posting fails `Job_Posting` validation, discard that posting, record a validation-failure event with the source identifier and external identifier, and continue processing the remainder — including when the posting came from the Fixture adapter.
   - Depends on: 36.1, 35.3, 3.6
   - _Requirements: RM-JOB-004 c3_ · _Design: Failure isolation rules_ · _Property: 35_
   - Done when: normalizing the six-posting fixture set yields five valid postings and one recorded validation failure naming `fixture` and the external identifier; a Hypothesis test over posting sets with an arbitrary invalid subset asserts exactly the valid postings are returned and exactly one failure is recorded per invalid posting; no exception escapes.
 
-- [ ] 36.3 [P0] Enforce the Candidate_Data separation boundary in the job unit
+- [x] 36.3 [P0] Enforce the Candidate_Data separation boundary in the job unit
   - Files: `backend/tests/privacy/test_job_candidate_separation.py`
   - Work: assert no `Public_Job_Data` record and no job ingestion log record carries a candidate identifier, a Session identifier, or `Candidate_Profile` content, and that `Match_Result` values are computed in Session-scoped process memory and never written to the job store. Assert the layering contract prevents `job` from importing `core.session`.
   - Depends on: 36.2, 2.1, 2.3
   - _Requirements: RM-JOB-007 c1, c2, c3_ · _Design: How the separation is enforced; D-15_ · _Property: 25_
   - Done when: `lint-imports` exits 0 and a temporary `from resumematch.core.session import Session` in `resumematch/job/normalizer.py` fails the `layers` contract; a marker-profile test asserts no marker appears in any ingestion log record; a test asserts `MatchResultSet` is reachable only from the Session and from no store module.
 
-- [ ] 36.4 [P0] Record the permitted source list and per-adapter documentation URLs
+- [x] 36.4 [P0] Record the permitted source list and per-adapter documentation URLs
   - Files: `docs/job-sources.md`, `backend/tests/unit/job/test_permitted_sources.py`
   - Work: restrict v1 sources to Greenhouse, Lever, Ashby, Adzuna, USAJobs, plus the Fixture adapter. Exclude LinkedIn and Indeed scraping, and HTML scraping of any site whose terms prohibit automated access. Record the endpoint documentation URL per adapter. Add `GET /api/v1/meta/sources` reporting the sources queried, the organization count, the data age, and the documentation URLs.
   - Depends on: 35.1, 4.5
@@ -1180,21 +1180,21 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-JOB-004 c1, c2, c4, c6_ · _Design: Failure isolation rules; D-40_
   - Done when: a test with two sources, one always failing, asserts the run completes with results from the healthy source and one recorded failure; a test asserting a 429 sequence shows backoff intervals increasing and the source abandoned after the configured maximum; a test asserts the per-source counter report has all four figures.
 
-- [ ] 37.4 [P1] Implement duplicate detection
+- [x] 37.4 [P1] Implement duplicate detection
   - Files: `backend/src/resumematch/job/dedup.py`, `backend/tests/properties/test_dedup.py`
   - Work: two rules and no others. Same `(source_id, source_external_id)` — treat as the same posting and retain the more recently ingested record. Same `(company_fold, title_fold, location_fold)` across different sources — mark as suspected duplicates and present the record with the lowest `internal_id` as primary. No fuzzy description similarity and no embedding-based deduplication.
   - Depends on: 36.1
   - _Requirements: RM-JOB-005 c1, c2, c4; AS-12_ · _Design: Job_Normalizer; D-42_ · _Property: 49_
   - Done when: a Hypothesis test over ingestion-order permutations asserts exactly one record per duplicate group is primary and the primary is order-independent; a test asserts the later-ingested record wins for an identical source pair; a test asserts the module imports no similarity or embedding library.
 
-- [ ] 37.5 [P1] Implement the `Public_Job_Data` store and the persisted-column gate
+- [x] 37.5 [P1] Implement the `Public_Job_Data` store and the persisted-column gate
   - Files: `backend/src/resumematch/job/store/{schema,queries}.py`, `backend/alembic/`, `tools/check_persisted_columns.py`, `docs/schemas/persisted_columns.txt`, `backend/tests/privacy/test_no_candidate_data_in_persistent_writes.py`
-  - Work: SQLAlchemy **Core** only — no declarative base, no ORM mapper, so no registry a candidate type could be registered in. The six tables the design lists, with the unique constraint on `(source_id, source_external_id)` and the index on the three folds. Alembic migrations. SQLite for dev and self-host, PostgreSQL 16 for hosted, one schema, two drivers. `tools/check_persisted_columns.py` reflects the metadata definition without a live database and asserts the `(table, column)` set equals `docs/schemas/persisted_columns.txt`.
+  - Work: SQLAlchemy **Core** only — no declarative base, no ORM mapper, so no registry a candidate type could be registered in. The five tables the design lists, with the unique constraint on `(source_id, source_external_id)` and the index on the three folds. Alembic migrations. SQLite for dev and self-host, PostgreSQL 16 for hosted, one schema, two drivers. `tools/check_persisted_columns.py` reflects the metadata definition without a live database and asserts the `(table, column)` set equals `docs/schemas/persisted_columns.txt`.
   - Depends on: 37.4, 2.3
   - _Requirements: RM-JOB-007 c1, c2, c3; RM-PRIV-001 c7, c9; RM-JOB-005_ · _Design: Persistence; D-14, D-15_ · _Property: 25_
   - Done when: `lint-imports` confirms no module outside `job.store.*` imports a database driver; adding a `candidate_profile_json` column fails `check_persisted_columns.py` naming the new column; `test_no_candidate_data_in_persistent_writes` runs the marker profile through the full pipeline against a real SQLite file and asserts no marker appears in any text column of any table, and that no raw bytes or `ExtractedText` is present at any database or filesystem location afterwards; a test asserts no declarative base exists in `job/store/`.
 
-- [ ] 37.6 [P1] Apply the maximum-posting-age filter to live postings only
+- [x] 37.6 [P1] Apply the maximum-posting-age filter to live postings only
   - Files: `backend/src/resumematch/job/store/queries.py`, `backend/tests/unit/job/test_max_age.py`
   - Work: exclude live-adapter postings older than the configured maximum age from result sets. Never apply the filter to Fixture-supplied postings, so the First Closed Loop does not depend on fixture timestamps.
   - Depends on: 37.5
@@ -1280,16 +1280,16 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 41. Experience, seniority, and education extraction
 
-- [ ] 41.1 [P0] Implement experience-range extraction with conflict handling
+- [x] 41.1 [P0] Implement experience-range extraction with conflict handling
   - Files: `backend/src/resumematch/job/requirements/experience.py`, `backend/tests/unit/job/test_experience_extraction.py`
   - Work: the design's fixed pattern set — `(\d+)\s*[-–to]+\s*(\d+)\+?\s*(years|yrs)`, `(\d+)\+\s*(years|yrs)`, `at least (\d+)`, `minimum of (\d+)`. A stated range populates both minimum and maximum; a single minimum such as `3+ years` populates the minimum and leaves the maximum unpopulated. Conflicting figures in one description retain the lowest stated minimum and set `experience_conflict`.
   - Depends on: 39.2
   - _Requirements: RM-REQX-002 c1, c2, c5_ · _Design: RM-REQX-002 pattern set_
   - Done when: a table test covers all four patterns; `3+ years` yields a minimum with no maximum; `2-4 years` yields both; a description stating both `5+ years` and `2+ years` yields minimum 2 with `experience_conflict = True`.
 
-- [ ] 41.2 [P0] Write `config/seniority_mapping.yaml` and implement seniority and education extraction
+- [x] 41.2 [P0] Write `config/seniority_mapping.yaml` and implement seniority and education extraction
   - Files: `config/seniority_mapping.yaml`, `backend/src/resumematch/job/requirements/seniority.py`, `backend/src/resumematch/job/requirements/education.py`, `backend/tests/unit/job/test_seniority_education.py`
-  - Work: derive seniority from a configured mapping over title tokens and stated experience, using one of `intern`, `entry`, `mid`, `senior`, `lead`, `unknown`, defaulting to `unknown` where it cannot be derived. Populate the education requirement fields where a minimum degree level or field is stated, recording whether the requirement is `required` or `preferred`.
+  - Work: derive seniority from versioned `config/seniority_mapping.yaml` over title tokens and stated experience, using one of `intern`, `entry`, `mid`, `senior`, `lead`, `unknown`, defaulting to `unknown` where it cannot be derived. The config supplies token mappings and thresholds; no LLM participates, and the mapping version is returned with the derivation. Populate the education requirement fields where a minimum degree level or field is stated, recording whether the requirement is `required` or `preferred`.
   - Depends on: 41.1, 3.3
   - _Requirements: RM-REQX-002 c3, c4, c6_ · _Design: RM-REQX-002_
   - Done when: table tests assert each of the six seniority values is derivable from at least one title, and that an unrecognized title yields `unknown`; a test asserts `Bachelor's degree in Computer Science required` populates the degree level, the field, and `required`; a test asserts a `preferred` degree statement records `preferred`.
@@ -1360,7 +1360,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 44. Total relevant experience
 
-- [ ] 44.1 [P0] Implement `Total_Relevant_Experience` as an interval union
+- [x] 44.1 [P0] Implement `Total_Relevant_Experience` as an interval union
   - Files: `backend/src/resumematch/matching/experience.py`, `backend/tests/properties/test_total_experience.py`
   - Work: admit the experience entries the configured relevance rule allows (all dated entries with a span of at least one calendar month, `present` resolving to `session_start_date`), convert to month indices, merge overlapping intervals so any calendar period covered by two or more entries counts once, and express the total in years quantized to one decimal place with `ROUND_DOWN`. Record the computed value and the identifiers of every contributing entry.
   - Depends on: 43.3, 26.3, 11.2
@@ -1371,33 +1371,33 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 45. Dimension scorers
 
-- [ ] 45.1 [P0] Implement the `DimensionScorer` protocol and the scorer registry
-  - Files: `backend/src/resumematch/matching/dimensions/__init__.py`, `backend/tests/unit/matching/test_scorer_registry.py`
-  - Work: the protocol with a `dimension_id` class variable, `is_enabled(profile, posting) -> EnablementVerdict`, and `score(profile, posting, evidence, cfg) -> DimensionScore`. A registry keyed by dimension id only, structurally parallel to the rubric's signal resolvers so no dimension can be special-cased by domain.
+- [x] 45.1 [P0] Implement the `DimensionScorer` protocol and the scorer registry
+  - Files: `config/matching_contract.yaml`, `backend/src/resumematch/matching/{contracts,dimensions/__init__}.py`, `backend/tests/unit/matching/test_scorer_registry.py`
+  - Work: load the versioned generic matching contracts: closed `DimensionId`, frozen `EnablementVerdict`, frozen Decimal-only `DimensionScore`, frozen structured-reference `EvidenceIndex`, and frozen loaded `MatchConfig`. The protocol has a `dimension_id` class variable, `is_enabled(profile, posting) -> EnablementVerdict`, and `score(profile, posting, evidence, cfg) -> DimensionScore`. A registry keyed by dimension id only, structurally parallel to the rubric's signal resolvers so no dimension can be special-cased by domain. Record the matching-contract version in score `VersionStamp` values.
   - Depends on: 43.1, 23.4
   - _Requirements: RM-MATCH-001 c1_ · _Design: Dimension scorers; D-19_
   - Done when: a test asserts the registry keys equal the seven `DimensionId` enum members exactly; `tools/check_no_domain_branch.py` exits 0 over `matching/`.
 
-- [ ] 45.2 [P0] Implement the skills and experience dimension scorers
+- [x] 45.2 [P0] Implement the skills and experience dimension scorers
   - Files: `backend/src/resumematch/matching/dimensions/{skills,experience}.py`, `backend/tests/properties/test_skills_experience_dimensions.py`
-  - Work: skills — score matched requirements weighted by each skill's Evidence_Level using the shared multiplier mapping, which the loader rejects if it omits a level or is not non-decreasing. Experience — compare `Total_Relevant_Experience` against the posting's minimum experience years. Both scores in `[0, 100]`, computed in `Decimal` over sorted identifiers.
+  - Work: skills — score matched requirements weighted by each skill's Evidence_Level using the shared multiplier mapping, which the loader rejects if it omits a level or is not non-decreasing. Experience — compare `Total_Relevant_Experience` against the posting's minimum experience years. Both internal `DimensionScore` values are normalized `Decimal` scores in `[0, 1]`, computed over sorted identifiers; only the reporting/API/presentation boundary converts an enabled score to the externally reported `0–100` scale using `quantize_half_up(score * Decimal("100"))`. Disabled dimensions remain null at both scales.
   - Depends on: 45.1, 44.1, 23.5
   - _Requirements: RM-MATCH-001 c1, c3_ · _Design: Dimension scorers; D-17, D-18_ · _Property: 1, 27_
-  - Done when: a Hypothesis test asserts both scores lie in `[0, 100]` and are permutation-invariant over requirement order; a test asserts a Level 3 match scores strictly above a Level 1 match for the same requirement; a test asserts a multiplier mapping omitting Level 2 is rejected at load.
+  - Done when: a Hypothesis test asserts both internal scores lie in `[0, 1]` and are permutation-invariant over requirement order; a test asserts a Level 3 match scores strictly above a Level 1 match for the same requirement; a test asserts a multiplier mapping omitting Level 2 is rejected at load; tests assert reporting conversion produces the expected `0–100` value, `DimensionScore` rejects `85`, and disabled dimensions remain null at both scales.
 
-- [ ] 45.3 [P0] Implement the role-similarity and domain-signals dimension scorers
-  - Files: `backend/src/resumematch/matching/dimensions/{role_similarity,domain_signals}.py`, `backend/tests/unit/matching/test_role_domain_dimensions.py`
-  - Work: role similarity — compare the posting's role family and normalized title against the profile's target role and prior role titles using the configured ordered-pair equivalence table, scoring an absent pair 0. Domain signals — derive the posting domain from the configured company list with the role-family fallback, compare it against the profile's target domain and the domains mapped from prior employers, scoring an absent pair 0.
+- [x] 45.3 [P0] Implement the role-similarity and domain-signals dimension scorers
+  - Files: `config/candidate_context_resolver.yaml`, `backend/src/resumematch/matching/{candidate_context,dimensions/{role_similarity,domain_signals}}.py`, `backend/tests/unit/matching/{test_candidate_context,test_role_domain_dimensions}.py`
+  - Work: resolve candidate role-family and domain facts only through `candidate_context_resolver@1`: target role ID, exact folded prior-title phrases, target-domain IDs, and configured folded employer-domain token phrases; unknown or absent values contribute 0. Role similarity — compare the posting's role family (or exact configured normalized-title fallback) against resolved target and prior role families using the configured ordered-pair equivalence table, taking the highest configured pair and scoring an absent pair 0. Domain signals — derive the posting domain from the configured company list with the role-family fallback, compare it against the resolved target domain and domains mapped from prior employers, taking the highest configured pair and scoring an absent pair 0. Both internal scores remain normalized Decimals in `[0, 1]`; record the resolver version in `VersionStamp`. No fuzzy matching, external enrichment, web lookup, or provider call.
   - Depends on: 45.1, 43.4
   - _Requirements: RM-MATCH-001 c10, c11; AS-15_ · _Design: D-26, D-27_
-  - Done when: a test asserts an ordered pair absent from either table scores exactly 0 and not a neutral mid-range value; a test asserts the embedded/software asymmetry produces different scores in the two directions; a test asserts an unlisted company falls back to its role family's domain.
+  - Done when: tests assert configured target role IDs, prior-title phrases, employer-domain tokens, and target-domain IDs resolve deterministically; unconfigured values remain unknown and contribute 0; a test asserts an ordered pair absent from either table scores exactly 0 and not a neutral mid-range value; a test asserts the embedded/software asymmetry produces different scores in the two directions; a test asserts an unlisted company falls back to its role family's domain; and a test asserts the resolver version is recorded.
 
-- [ ] 45.4 [P0] Implement the seniority, education, and location/work-mode dimension scorers
-  - Files: `backend/src/resumematch/matching/dimensions/{seniority,education,location_workmode}.py`, `backend/tests/unit/matching/test_remaining_dimensions.py`
-  - Work: seniority — compare the posting's derived seniority against the profile's target seniority. Education — compare the posting's education requirement against the profile's degree level and field. Location and work mode — compare the posting's normalized location and work-mode indicator against the user's declared location set and work-mode constraint.
+- [x] 45.4 [P0] Implement the seniority, education, and location/work-mode dimension scorers
+  - Files: `config/dimension_match_scoring.yaml`, `backend/src/resumematch/matching/{dimension_scoring,dimensions/{seniority,education,location_workmode}}.py`, `backend/tests/unit/matching/test_remaining_dimensions.py`
+  - Work: load `dimension_match_scoring@1` with Decimal-only normalized scores and weights. Seniority compares configured-order distance; education combines configured degree and exact/related configured-field scores; location/work-mode combines configured structured compatibility scores. Unknown, absent, or unresolved values score 0. No free-text inference, fuzzy matching, geocoding, web lookup, or provider call.
   - Depends on: 45.1, 41.2
   - _Requirements: RM-MATCH-001 c1_ · _Design: Dimension scorers_
-  - Done when: unit tests give each of the three scorers at least one exact-match, one partial-match, and one no-match case with the expected score; all three scores lie in `[0, 100]`.
+  - Done when: unit tests give each of the three scorers at least one exact-match, one partial-match, and one no-match case with the expected score; every internal `DimensionScore` lies in `[0, 1]`, and any required external reporting conversion is performed only at the reporting/API/presentation boundary on a `0–100` scale.
 
 - [ ] 45.5 [P0] Add the raw-description independence property test
   - Files: `backend/tests/properties/test_raw_description_independence.py`

@@ -1,0 +1,33 @@
+seniority_mapping_version: seniority_mapping@1
+seniority_order: [intern, trainee, entry, junior, mid, senior, lead, manager]
+enum_values:
+  intern: intern
+  trainee: entry
+  entry: entry
+  junior: entry
+  mid: mid
+  senior: senior
+  lead: lead
+  manager: manager
+strong_title_levels: [intern, trainee, entry, junior, senior, lead, manager]
+title_tokens:
+  intern: [intern, internship, summer intern]
+  trainee: [trainee, management trainee, graduate trainee]
+  entry: [fresher, fresh graduate, graduate, new grad, new graduate, entry level, entry-level]
+  junior: [junior, jr, associate]
+  mid: [analyst, specialist, executive, consultant]
+  senior: [senior, sr, experienced]
+  lead: [lead, principal, staff]
+  manager: [manager, head, director]
+experience_thresholds:
+  entry: {min_years_gte: 0, min_years_lt: 1}
+  junior: {min_years_gte: 1, min_years_lt: 3}
+  mid: {min_years_gte: 3, min_years_lt: 5}
+  senior: {min_years_gte: 5, min_years_lt: 8}
+  lead: {min_years_gte: 8, min_years_lt: 12}
+  manager: {min_years_gte: 12}
+max_only_thresholds:
+  entry: {max_years_lte: 1}
+  junior: {max_years_lte: 3}
+  mid: {max_years_lte: 5}
+fallback: unknown
