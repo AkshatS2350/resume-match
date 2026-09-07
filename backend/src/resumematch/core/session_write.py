@@ -4,7 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from .session import Session, _SanitizedResumeRef
+from .schemas.sanitized import SanitizedResume
+from .session import Session
 
 
 class SanitizationRecord(BaseModel):
@@ -20,7 +21,7 @@ class SanitizationRecord(BaseModel):
 
 
 def write_sanitization_record(
-    session: Session, resume: _SanitizedResumeRef, record: SanitizationRecord
+    session: Session, resume: SanitizedResume, record: SanitizationRecord
 ) -> None:
     session._sanitized_resume = resume
     session._sanitization_record = record

@@ -9,6 +9,7 @@ from datetime import date, datetime, timedelta
 from threading import RLock
 
 from .clock import Clock
+from .schemas.sanitized import SanitizedResume
 
 
 class _ExtractedTextRef:
@@ -57,7 +58,7 @@ class Session:
         self.extracted_text: _ExtractedTextRef | None = None
         self.structured_resume: _StructuredResumeRef | None = None
         self.candidate_profile: _CandidateProfileRef | None = None
-        self._sanitized_resume: _SanitizedResumeRef | None = None
+        self._sanitized_resume: SanitizedResume | None = None
         self._sanitization_record: object | None = None
         self.llm_manifest: deque[_ManifestEntryRef] = deque(maxlen=200)
         self.pending_llm_request: _PendingRequestRef | None = None
@@ -66,7 +67,7 @@ class Session:
         self.consent = _ConsentStateRef()
 
     @property
-    def sanitized_resume(self) -> _SanitizedResumeRef | None:
+    def sanitized_resume(self) -> SanitizedResume | None:
         return self._sanitized_resume
 
     @property

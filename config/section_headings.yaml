@@ -1,0 +1,27 @@
+version: section_headings@1
+sections:
+  summary:
+    - summary
+    - professional summary
+    - profile
+  skills:
+    - skills
+    - technical skills
+    - core competencies
+  experience:
+    - experience
+    - work experience
+    - professional experience
+    - employment history
+  education:
+    - education
+    - academic background
+  projects:
+    - projects
+    - selected projects
+  certifications:
+    - certifications
+    - certifications and licenses
+  achievements:
+    - achievements
+    - awards

@@ -464,7 +464,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 12. Resume structuring
 
-- [ ] 12.1 [P0] Implement the heading gazetteer and section assignment
+- [x] 12.1 [P0] Implement the heading gazetteer and section assignment
   - Files: `backend/src/resumematch/resume/structure/sections.py`, `config/section_headings.yaml`, `backend/tests/unit/resume/test_section_assignment.py`
   - Work: a version-controlled heading gazetteer mapping heading surface forms to the seven section identifiers. Match over `ExtractedBlock`s whose `layout_kind == "heading"`. Handle absent, duplicated, and unrecognized headings by routing the affected content to `unclassified` rather than discarding it.
   - Depends on: 11.2, 9.3
@@ -478,14 +478,14 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-PARSE-003 c3_ · _Design: Determinism — `present` resolution_ · _Property: 47_
   - Done when: a table-driven test covers at least twelve real range formats including `Jan 2023 – Present`, `2021-2022`, `06/2020 to 08/2020`, and one inverted range; the inverted range sets `date_conflict = True` and does not raise; `tools/check_determinism.py` reports no clock use in the module.
 
-- [ ] 12.3 [P0] Implement the deterministic `Extraction_Confidence` calculation
+- [x] 12.3 [P0] Implement the deterministic `Extraction_Confidence` calculation
   - Files: `backend/src/resumematch/resume/structure/confidence.py`, `backend/tests/unit/resume/test_extraction_confidence.py`
   - Work: sum the design's documented contributions — base 0.50, `heading_matched` +0.20, `layout_clean` +0.10, `pattern_complete` +0.15, `date_parsed` +0.05, `unclassified_section` −0.25, `encoding_anomaly` −0.15, `table_spliced` −0.10 — clamped to `[0.00, 1.00]` in `Decimal`, recording the contributing input names on the item. No LLM input can reach this value.
   - Depends on: 12.1, 12.2
   - _Requirements: RM-PARSE-005 c2, c3, c6_ · _Design: Extraction_Confidence table_
   - Done when: one unit test per contribution asserts the exact resulting value and the exact `confidence_inputs` tuple; a test asserts an item with all negative contributions clamps at 0.00 and never below; a test asserts the module imports nothing from `resumematch.llm` and `lint-imports` confirms `resume` sits below `llm`.
 
-- [ ] 12.4 [P0] Resolve skill surfaces to canonical identifiers in the Structurer
+- [x] 12.4 [P0] Resolve skill surfaces to canonical identifiers in the Structurer
   - Files: `backend/src/resumematch/resume/structure/skills.py`, `backend/tests/unit/resume/test_structurer_skill_resolution.py`
   - Work: populate `SkillItem.surface` from the source text and `SkillItem.canonical_skill_id` from the injected `Skill_Normalizer`, preserving `source_text` alongside the normalized value.
   - Depends on: 22.1, 22.2, 22.3, 12.1 — **Deviation 1: build task block 22 first**
@@ -631,21 +631,21 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-PRIV-002 c3_ · _Design: Policy table; stated tradeoff_
   - Done when: a test with employer `Morgan Stanley` asserts the value is unchanged in the `Sanitized_Resume`; a test with a person name embedded in a project description asserts the name is replaced by its placeholder and every other character of the description is preserved byte-for-byte.
 
-- [ ] 17.2 [P0] Implement placeholder substitution and whole-value field retention
+- [x] 17.2 [P0] Implement placeholder substitution and whole-value field retention
   - Files: `backend/src/resumematch/privacy/sanitizer.py`, `backend/tests/properties/test_sanitizer_substitution.py`
   - Work: perform every removal as substitution of the per-category constant placeholder. When a field's entire value is removed, retain the field with the placeholder as its value rather than deleting the field — so no field path disappears through sanitization. Exclude the text of every removed span in whole and in part.
   - Depends on: 17.1, 11.3
   - _Requirements: RM-PRIV-002 c9_ · _Design: `SanitizedResume` reuses `StructuredResume`_ · _Property: 18_
   - Done when: a Hypothesis test asserts no substring of length three or greater taken from any removed span appears at any field path of the `Sanitized_Resume`; a test asserts the set of field paths in the `Sanitized_Resume` equals the set in the source `CandidateProfile`; a test asserts two distinct values of the same category at the same field path yield identical output.
 
-- [ ] 17.3 [P0] Implement the fail-safe redaction below the confidence floor
+- [x] 17.3 [P0] Implement the fail-safe redaction below the confidence floor
   - Files: `backend/src/resumematch/privacy/sanitizer.py`, `backend/tests/unit/privacy/test_failsafe_redaction.py`
   - Work: where a detected span lies outside a Retain-default field and its classification confidence is below the configured minimum, remove it and record the decision as a fail-safe redaction, counted on the sanitization record.
   - Depends on: 17.2, 16.2
   - _Requirements: RM-PRIV-002 c5_ · _Design: D-37; AS-17_
   - Done when: a test with a span at confidence 0.79 against a floor of 0.80 asserts removal and a `fail_safe_redaction_count` of 1; a test at 0.80 asserts normal-path removal and a count of 0; a test asserts a low-confidence span inside a Retain-default field is **not** removed.
 
-- [ ] 17.4 [P0] Define `SanitizedResume` and produce the sanitization record
+- [x] 17.4 [P0] Define `SanitizedResume` and produce the sanitization record
   - Files: `backend/src/resumematch/core/schemas/sanitized.py`, `backend/src/resumematch/privacy/sanitizer.py`, `backend/tests/properties/test_sanitization_record.py`
   - Work: `SanitizedResume` (frozen: `schema_version`, `source_profile_revision`, `resume` reusing `StructuredResume`, `target`, `removed_span_counts` as category-to-count with no values). Write the record through `core/session_write.py` only, keyed by the canonical SHA-256 content hash plus the `profile_revision`, and carrying the policy, detector, and placeholder-set versions, the removed categories, and the fail-safe count.
   - Depends on: 17.3, 3.8, 3.1
