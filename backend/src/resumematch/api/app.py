@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse, Response
 from resumematch.api.composition import build_components
 from resumematch.api.ratelimit import TokenBucketLimiter
 from resumematch.api.routers.meta import router as meta_router
+from resumematch.api.routers.privacy import router as privacy_router
 from resumematch.api.routers.profile import router as profile_router
 from resumematch.api.routers.resume import router as resume_router
 from resumematch.api.routers.sessions import router as sessions_router
@@ -130,7 +131,11 @@ def create_app(*routers: APIRouter) -> FastAPI:
 
     @application.exception_handler(PipelineError)
     async def pipeline_error(_: Request, error: PipelineError) -> JSONResponse:
-        stage = PipelineStage.SCORE if error.code is ErrorCode.SCORING_FAILED else PipelineStage.ANY
+        stage = (
+            PipelineStage.SCORE
+            if error.code in {ErrorCode.SCORING_FAILED, ErrorCode.PROFILE_NOT_CONFIRMED}
+            else PipelineStage.ANY
+        )
         return _response(
             ErrorResponse(
                 code=error.code,
@@ -163,4 +168,4 @@ def create_app(*routers: APIRouter) -> FastAPI:
     return application
 
 
-app = create_app(sessions_router, resume_router, profile_router, meta_router)
+app = create_app(sessions_router, resume_router, profile_router, privacy_router, meta_router)

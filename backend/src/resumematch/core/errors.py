@@ -92,6 +92,16 @@ class ScoringFailedError(PipelineError):
     def __init__(self, _: str = "", *, context: Mapping[str, str | int] | None = None) -> None:
         super().__init__("Scoring failed. Please try again.", context=context)
 
+
+class ProfileNotConfirmedError(PipelineError):
+    """Fail closed before scoring or matching can inspect an unconfirmed profile."""
+
+    code = ErrorCode.PROFILE_NOT_CONFIRMED
+
+    def __init__(self) -> None:
+        super().__init__("Profile must be confirmed before scoring or matching.")
+
+
 # Publicly named today; the remaining fail-closed types are introduced by their
 # owning pipeline tasks using the same closed-code mechanism above.
 SessionNotFoundError: type[PipelineError] = _error_type(
@@ -121,4 +131,7 @@ ExtractionTimeoutError: type[PipelineError] = _error_type(
 )
 PiiDetectionUnavailableError: type[PipelineError] = _error_type(
     "PiiDetectionUnavailableError", ErrorCode.PII_DETECTION_UNAVAILABLE
+)
+SanitizationIncompleteError: type[PipelineError] = _error_type(
+    "SanitizationIncompleteError", ErrorCode.SANITIZATION_INCOMPLETE
 )

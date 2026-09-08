@@ -508,21 +508,21 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 13. Profile review and correction
 
-- [ ] 13.1 [P0] Implement the profile read, update, and confirm endpoints
+- [x] 13.1 [P0] Implement the profile read, update, and confirm endpoints
   - Files: `backend/src/resumematch/api/routers/profile.py`, `backend/tests/integration/test_profile_edit.py`
   - Work: `GET /api/v1/sessions/profile` returning the current profile; `PUT /api/v1/sessions/profile` applying add, edit, and remove across every section including `unclassified`, incrementing `profile_revision` on every mutation, setting each edited item's `origin` to `user_provided` and its `extraction_confidence` to `1.00`, and recomputing `duration_months` when a date changes; `POST /api/v1/sessions/profile/confirm` accepting `TargetConstraints` and setting `confirmed`.
   - Depends on: 12.6, 11.3, 12.2
   - _Requirements: RM-REV-001 c1, c2, c3, c4, c7; RM-UI-001 c2, c3_ · _Design: API Boundaries_ · _Property: 47_
   - Done when: a Hypothesis test over edit sequences asserts every edited item ends with `origin == "user_provided"` and `extraction_confidence == Decimal("1.00")`, and every experience item's `duration_months` stays consistent with its dates; a test asserts `profile_revision` strictly increases on every `PUT`; a test asserts `GET` after a simulated reload within the same Session returns the corrections.
 
-- [ ] 13.2 [P0] Gate scoring on a confirmed profile
+- [x] 13.2 [P0] Gate scoring on a confirmed profile
   - Files: `backend/src/resumematch/api/deps.py`, `backend/tests/properties/test_confirmation_gate.py`
   - Work: a FastAPI dependency that returns `PROFILE_NOT_CONFIRMED` (409) for any readiness or matching request whose Session profile is not confirmed, before the engine is constructed.
   - Depends on: 13.1
   - _Requirements: RM-REV-001 c1_ · _Design: Error Handling — `PROFILE_NOT_CONFIRMED`_ · _Property: 46_
   - Done when: a Hypothesis test over unconfirmed profiles asserts every readiness and matching request returns 409 `PROFILE_NOT_CONFIRMED` and that counting spies on the Rubric_Engine and Matching_Engine record zero executions.
 
-- [ ] 13.3 [P0] Build the Profile_Review_UI editing surface
+- [x] 13.3 [P0] Build the Profile_Review_UI editing surface
   - Files: `web/src/app/review/page.tsx`, `web/src/components/ProfileSectionEditor.tsx`, `web/tests/ProfileSectionEditor.test.tsx`
   - Work: add, edit, and remove items in every section including `unclassified`; edit experience titles and dates with the displayed duration recomputed on change; mark every item whose `extraction_confidence` is below 0.60 as needing review and show its original `source_text`; persist corrections across a reload via `sessionStorage`.
   - Depends on: 13.1, 11.3
@@ -652,7 +652,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-PRIV-003 c6, c10; RM-PRIV-004 c1, c5_ · _Design: D-08, D-09_ · _Property: 18, 19_
   - Done when: a test asserts a re-run of the `PII_Detector` over each sanitized fixture yields zero findings in removal categories; a Hypothesis test asserts `sanitize(sanitize(x)) == sanitize(x)` under field-by-field equality of the serialized form across the whole privacy corpus; a test asserts the record's `content_hash` equals `canonical_sha256(sanitized)`; a test asserts mutating the profile invalidates the record via the `profile_revision` comparison.
 
-- [ ] 17.5 [P0] Implement the sanitize endpoint and the sanitized-resume view endpoint
+- [x] 17.5 [P0] Implement the sanitize endpoint and the sanitized-resume view endpoint
   - Files: `backend/src/resumematch/api/routers/privacy.py`, `backend/tests/integration/test_sanitize_endpoints.py`
   - Work: `POST /api/v1/sessions/sanitize` running the Sanitizer and returning the record summary only, never the payload. `GET /api/v1/sessions/sanitized-resume` returning the complete `Sanitized_Resume` in a response model explicitly labelled as the sanitization result held in Session state, with `removed_categories` and `fail_safe_redaction_count`.
   - Depends on: 17.4, 4.3
@@ -696,7 +696,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-PRIV-003 c8; RM-PRIV-001 c6_ · _Design: Session_Store_ · _Property: 24_
   - Done when: a Hypothesis test over request sequences longer than 200 asserts exactly the 200 most recent entries survive in order; a test asserts no entry field can hold a candidate-derived value (enumerate the entry model's fields); a test asserts session deletion removes the manifest.
 
-- [ ] 18.6 [P0] Add the runtime boundary tests to the `boundary` gate
+- [x] 18.6 [P0] Add the runtime boundary tests to the `boundary` gate
   - Files: `backend/tests/privacy/test_boundary_runtime.py`, `.github/workflows/ci.yml`
   - Work: the design's three runtime tests — `test_no_socket_during_deterministic_pipeline` (patched `socket.socket.connect` raiser across upload → readiness → matching on fixtures); `test_stub_provider_zero_invocations_on_rejection` (zero invocations for every rejection path of `RM-PRIV-003` c3, c5, c10); `test_egress_host_allowlist_rejects_model_host_from_job_enclave` (a fixture adapter attempting a model host through its own grant must raise `EgressHostNotAllowed` and emit one `severity=error` event). Plus `test_no_candidate_markers_in_outbound_bodies` over a marker-seeded profile.
   - Depends on: 18.2, 2.5, 5.2
@@ -1983,38 +1983,38 @@ Wave-level. Each wave below is a set of tasks with no dependency on each other, 
     },
     {
       "wave": 15,
-      "tasks": ["10.1", "13.1", "18.4", "18.5", "18.6", "46.2"],
-      "description": "Profile read, update, and confirm; budget reduction and the value-free manifest; the runtime boundary tests; proportional weight redistribution."
+      "tasks": ["10.1", "13.1", "18.4", "18.5", "18.6"],
+      "description": "Profile read, update, and confirm; budget reduction and the value-free manifest; and the runtime boundary tests."
     },
     {
       "wave": 16,
-      "tasks": ["13.2", "13.3", "17.5", "21.1", "47.1"],
-      "description": "Scoring gated on a confirmed profile, the Profile_Review_UI, the sanitize and sanitized-resume endpoints after the real CandidateProfile session chain, the pending-request endpoints, and the once-per-requirement hard-requirement penalty."
+      "tasks": ["13.2", "13.3", "17.5", "46.2"],
+      "description": "Scoring gated on a confirmed profile, the Profile_Review_UI, the sanitize and sanitized-resume endpoints after the real CandidateProfile session chain, and proportional weight redistribution after per-dimension enablement."
     },
     {
       "wave": 17,
-      "tasks": ["13.4", "14.1", "21.2", "29.3", "47.2", "47.3"],
-      "description": "Empty-profile warning, the axe accessibility gate, the Privacy_Inspector screens, the readiness endpoint, and the three-valued disqualification checks."
+      "tasks": ["13.4", "14.1", "21.1", "29.3", "47.1"],
+      "description": "Empty-profile warning, the axe accessibility gate, the pending-request endpoints, the readiness endpoint, and once-per-requirement hard-requirement penalties."
     },
     {
       "wave": 18,
-      "tasks": ["30.1", "32.1", "48.1"],
-      "description": "Career-target selection, the readiness benchmark (consuming the 27.1 decision), and the reason-code rank order."
+      "tasks": ["30.1", "32.1", "47.2", "47.3"],
+      "description": "Career-target selection, the readiness benchmark (consuming the 27.1 decision), the excluded-category informational path, and three-valued disqualification checks."
     },
     {
       "wave": 19,
-      "tasks": ["30.2", "48.2"],
-      "description": "The readiness screen with its mandatory decomposition, and the classification precedence ladder expressed as data."
+      "tasks": ["30.2", "48.1"],
+      "description": "The readiness screen with its mandatory decomposition and the reason-code rank order."
     },
     {
       "wave": 20,
-      "tasks": ["31.3", "32.2", "48.3"],
-      "description": "Confidence band display, the pipeline-stage progress indicator, and disqualification provenance recorded on the result."
+      "tasks": ["31.3", "32.2", "48.2"],
+      "description": "Confidence band display, the pipeline-stage progress indicator, and the classification precedence ladder expressed as data."
     },
     {
       "wave": 21,
-      "tasks": ["49.1"],
-      "description": "The `MatchResult` and `ConfidenceResult` models."
+      "tasks": ["48.3", "49.1"],
+      "description": "Disqualification provenance recorded on the result, plus the `MatchResult` and `ConfidenceResult` models."
     },
     {
       "wave": 22,

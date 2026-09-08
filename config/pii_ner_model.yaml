@@ -1,0 +1,3 @@
+version: pii_ner_model@1
+model_name: en_core_web_sm
+model_version: 3.8.0

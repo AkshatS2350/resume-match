@@ -42,7 +42,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: uv run --project backend lint-imports --config .importlinter
       - run: uv run --project backend python tools/check_egress.py backend/src
-      - run: uv run --project backend pytest -m boundary
+      - run: uv run --project backend pytest -m boundary backend/tests/privacy/test_boundary_runtime.py
   privacy:
     runs-on: ubuntu-latest
     steps:

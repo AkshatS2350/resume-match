@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any
+from typing import cast
 
 from resumematch.core.canonical_json import canonical_sha256
 from resumematch.core.clock import Clock
@@ -12,11 +12,13 @@ from resumematch.core.schemas.candidate import CandidateProfile, StructuredResum
 from resumematch.core.schemas.sanitized import SanitizedResume
 from resumematch.core.session import Session
 from resumematch.core.session_write import SanitizationRecord, write_sanitization_record
-from resumematch.privacy.detector import PiiDetectionMechanism
+from resumematch.privacy.detector import PiiDetectionMechanism, PIIDetector
 from resumematch.privacy.detectors.rules import Detection
 from resumematch.privacy.placeholders import Placeholders
 from resumematch.privacy.policy import PiiPolicy
 from resumematch.privacy.spans import resolve_spans
+
+type JsonValue = str | int | bool | None | list[JsonValue] | dict[str, JsonValue]
 
 
 @dataclass(frozen=True)
@@ -92,8 +94,10 @@ def sanitize_profile(
     counts: dict[str, int] = {}
     fail_safe_count = 0
 
-    def visit(value: Any, path: str) -> Any:
+    def visit(value: JsonValue, path: str) -> JsonValue:
         nonlocal fail_safe_count
+        if path.endswith("/schema_version"):
+            return value
         if isinstance(value, str):
             detections = detector.detect(value)
             result = sanitizer.sanitize_value(path=path, value=value, detections=detections)
@@ -108,7 +112,7 @@ def sanitize_profile(
             return {key: visit(item, f"{path}/{key}") for key, item in value.items()}
         return value
 
-    data = visit(profile.model_dump(mode="json"), "")
+    data = cast(dict[str, JsonValue], visit(profile.model_dump(mode="json"), ""))
     sanitized = SanitizedResume(
         schema_version="sanitized_resume/1",
         source_profile_revision=profile.profile_revision,
@@ -121,7 +125,9 @@ def sanitize_profile(
         profile_revision=profile.profile_revision,
         produced_at=clock.now(),
         pii_policy_version=sanitizer.policy.version,
-        detector_versions=(detector.version,),
+        detector_versions=(
+            detector.detector_versions if isinstance(detector, PIIDetector) else (detector.version,)
+        ),
         placeholder_set_version=sanitizer.placeholders.version,
         removed_categories=tuple(sorted(counts)),
         fail_safe_redaction_count=fail_safe_count,

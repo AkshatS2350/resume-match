@@ -2198,6 +2198,8 @@ Capacity implication, stated rather than hidden: a single Python worker serves t
 
 Client side (RM-SESS-001 c3, c4; OD-10): `sessionStorage` holds the session token and workflow step state. No `localStorage`, no IndexedDB for Candidate_Data. Copy describes it as session-scoped browser storage and never as "never stored".
 
+The approved Presidio spaCy model is a pinned deployment and CI artifact named in `config/pii_ner_model.yaml`. It must be available before analyzer initialization; runtime model downloads are forbidden. Its name and version are included in sanitization detector metadata, and an absent or incompatible model fails sanitization closed.
+
 ### Persistence and the Public_Job_Data store
 
 **First Closed Loop: no database (D-13).**

@@ -11,6 +11,7 @@ from threading import RLock
 from typing import Literal
 
 from .clock import Clock
+from .schemas.candidate import CandidateProfile
 from .schemas.sanitized import SanitizedResume
 
 
@@ -19,10 +20,6 @@ class _ExtractedTextRef:
 
 
 class _StructuredResumeRef:
-    pass
-
-
-class _CandidateProfileRef:
     pass
 
 
@@ -70,7 +67,7 @@ class Session:
         self.profile_revision = 0
         self.extracted_text: _ExtractedTextRef | None = None
         self.structured_resume: _StructuredResumeRef | None = None
-        self.candidate_profile: _CandidateProfileRef | None = None
+        self.candidate_profile: CandidateProfile | None = None
         self._sanitized_resume: SanitizedResume | None = None
         self._sanitization_record: object | None = None
         self.llm_manifest: deque[CloudLLMRequestManifestEntry] = deque(maxlen=200)

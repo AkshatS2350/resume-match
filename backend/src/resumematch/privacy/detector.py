@@ -28,6 +28,10 @@ class PIIDetector:
     def detector_versions(self) -> tuple[str, ...]:
         return tuple(mechanism.version for mechanism in self.mechanisms)
 
+    @property
+    def version(self) -> str:
+        return "+".join(self.detector_versions)
+
     def detect(self, text: str) -> tuple[Detection, ...]:
         by_span: dict[tuple[str, int, int], Detection] = {}
         for mechanism in self.mechanisms:

@@ -45,6 +45,27 @@ def _index(value: YearMonth) -> int:
     return value.year * 12 + value.month - 1
 
 
+def recompute_experience_dates(
+    start_date: YearMonth | None,
+    end_date: YearMonth | None,
+    is_present: bool,
+    session_start_date: date,
+) -> ParsedExperienceDates:
+    """Return deterministic experience dates and duration after a profile edit."""
+
+    effective_end = (
+        YearMonth(year=session_start_date.year, month=session_start_date.month)
+        if is_present
+        else end_date
+    )
+    if start_date is None or effective_end is None:
+        return ParsedExperienceDates(start_date, effective_end, is_present, None, False)
+    duration = _index(effective_end) - _index(start_date)
+    if duration < 0:
+        return ParsedExperienceDates(start_date, effective_end, is_present, None, True)
+    return ParsedExperienceDates(start_date, effective_end, is_present, duration, False)
+
+
 def parse_experience_dates(text: str, session_start_date: date) -> ParsedExperienceDates:
     """Parse one range; `present` resolves solely from supplied session data."""
 
@@ -59,7 +80,4 @@ def parse_experience_dates(text: str, session_start_date: date) -> ParsedExperie
         if is_present
         else _parse_month(end_token)
     )
-    duration = _index(end) - _index(start)
-    if duration < 0:
-        return ParsedExperienceDates(start, end, is_present, None, True)
-    return ParsedExperienceDates(start, end, is_present, duration, False)
+    return recompute_experience_dates(start, end, is_present, session_start_date)

@@ -9,6 +9,12 @@ from resumematch.core.clock import Clock, SystemClock
 from resumematch.core.config import Settings
 from resumematch.core.egress import EgressEnclave, EgressGrant, issue_grant
 from resumematch.core.session import SessionStore
+from resumematch.privacy.detector import PIIDetector
+from resumematch.privacy.detectors.ner import LocalPresidioNerDetector, load_presidio_model_config
+from resumematch.privacy.detectors.rules import load_rule_detector
+from resumematch.privacy.placeholders import load_placeholders
+from resumematch.privacy.policy import load_pii_policy
+from resumematch.privacy.sanitizer import Sanitizer
 from resumematch.resume.structure.sections import SectionHeadings, load_section_headings
 from resumematch.skill.alias_loader import load_aliases
 from resumematch.skill.normalizer import SkillNormalizer
@@ -38,6 +44,8 @@ class ApplicationComponents:
     job_source_grant: EgressGrant
     section_headings: SectionHeadings
     skill_normalizer: SkillNormalizer
+    pii_detector: PIIDetector
+    sanitizer: Sanitizer
 
 
 def build_components() -> ApplicationComponents:
@@ -45,6 +53,7 @@ def build_components() -> ApplicationComponents:
 
     clock = SystemClock()
     egress_settings = _CompositionEgressSettings()
+    pii_policy = load_pii_policy(_ROOT / "config" / "pii_policy.yaml")
     return ApplicationComponents(
         clock=clock,
         session_store=SessionStore(clock),
@@ -53,6 +62,18 @@ def build_components() -> ApplicationComponents:
         job_source_grant=issue_grant(egress_settings, "job_source"),
         section_headings=load_section_headings(_ROOT / "config" / "section_headings.yaml"),
         skill_normalizer=SkillNormalizer(load_aliases(_ROOT / "ontology" / "skills.yaml")),
+        pii_detector=PIIDetector(
+            (
+                load_rule_detector(_ROOT / "config" / "pii_rules.yaml"),
+                LocalPresidioNerDetector(
+                    load_presidio_model_config(_ROOT / "config" / "pii_ner_model.yaml")
+                ),
+            )
+        ),
+        sanitizer=Sanitizer(
+            pii_policy,
+            load_placeholders(_ROOT / "config" / "pii_placeholders.yaml", pii_policy),
+        ),
     )
 
 
