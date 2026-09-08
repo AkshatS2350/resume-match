@@ -689,7 +689,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-LLM-003 c6; RM-PRIV-003 c12; C-6_ · _Design: Budget-driven omission; D-28, D-29_ · _Property: 23_
   - Done when: a Hypothesis test over projections and budgets asserts either the result fits the budget with every included value untouched, or `guidance_unavailable` with reason `budget_exhausted`; asserts no path in `required_candidate_paths` is ever omitted; asserts the omission sequence matches the configured priority order; asserts identical inputs and budget produce an identical reduced request; asserts every omission is recorded with reason `omitted_for_budget`.
 
-- [ ] 18.5 [P0] Implement the bounded, value-free `Cloud_LLM_Request` manifest
+- [x] 18.5 [P0] Implement the bounded, value-free `Cloud_LLM_Request` manifest
   - Files: `backend/src/resumematch/core/session.py`, `backend/src/resumematch/llm/gateway.py`, `backend/tests/properties/test_manifest.py`
   - Work: one manifest entry per request containing the field-path names, the omission record, the transmitted payload's content hash, and the transmission time from the injected clock. `deque(maxlen=200)`, oldest discarded first. Discarded together with the Session's Candidate_Data.
   - Depends on: 18.2, 3.7

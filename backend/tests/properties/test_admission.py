@@ -7,6 +7,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from resumematch.core.canonical_json import canonical_sha256
+from resumematch.core.clock import FixedClock
 from resumematch.core.schemas.candidate import (
     SeniorityId,
     StructuredResume,
@@ -19,6 +20,8 @@ from resumematch.core.session_write import SanitizationRecord, write_sanitizatio
 from resumematch.llm.budget import BudgetExceeded, PayloadBudget
 from resumematch.llm.gateway import AdmissionDenial, AdmissionDenied, AdmittedPayload, admit
 from resumematch.llm.projection import FieldPath, LLMOperation, ProjectionRequest
+
+_CLOCK = FixedClock(datetime(2026, 1, 1, tzinfo=UTC))
 
 
 def _sanitized() -> SanitizedResume:
@@ -92,33 +95,47 @@ def _request(
 
 def test_admission_resolves_required_paths_at_resume_root_and_excludes_wrapper_metadata() -> None:
     session, sanitized = _session()
-    admitted = admit(session, _request(canonical_sha256(sanitized.model_dump(mode="json"))))
+    admitted = admit(
+        session,
+        _request(canonical_sha256(sanitized.model_dump(mode="json"))),
+        clock=_CLOCK,
+    )
 
     assert isinstance(admitted, AdmittedPayload)
     assert admitted.payload == {"/unclassified/0/text": "sanitized text"}
     assert "/source_profile_revision" not in admitted.payload
     assert "/removed_span_counts" not in admitted.payload
+    entry = session.llm_manifest[-1]
+    assert entry.field_paths == ("/unclassified/0/text",)
+    assert entry.omitted_paths == ()
+    assert entry.payload_hash == canonical_sha256(dict(admitted.payload))
+    assert entry.transmitted_at == _CLOCK.now()
+    assert "sanitized text" not in str(entry)
 
 
 def test_missing_record_hash_and_revision_are_deterministically_denied() -> None:
     session, sanitized = _session()
     request = _request(canonical_sha256(sanitized.model_dump(mode="json")))
 
-    missing = admit(Session("token", datetime(2026, 1, 1, tzinfo=UTC)), request)
+    missing = admit(Session("token", datetime(2026, 1, 1, tzinfo=UTC)), request, clock=_CLOCK)
     assert missing == AdmissionDenied(AdmissionDenial.SANITIZATION_INCOMPLETE)
-    assert admit(session, _request("sha256:" + "0" * 64)) == AdmissionDenied(
+    assert admit(session, _request("sha256:" + "0" * 64), clock=_CLOCK) == AdmissionDenied(
         AdmissionDenial.SANITIZATION_HASH_MISMATCH
     )
     session.profile_revision += 1
-    assert admit(session, request) == AdmissionDenied(AdmissionDenial.SANITIZATION_STALE)
+    assert admit(session, request, clock=_CLOCK) == AdmissionDenied(
+        AdmissionDenial.SANITIZATION_STALE
+    )
 
 
 def test_outer_wrapper_paths_and_missing_required_wildcards_fail_closed() -> None:
     session, sanitized = _session()
     content_hash = canonical_sha256(sanitized.model_dump(mode="json"))
 
-    unknown = admit(session, _request(content_hash, (FieldPath("/source_profile_revision"),)))
-    missing = admit(session, _request(content_hash, operation="summarize_skill_gaps"))
+    unknown = admit(
+        session, _request(content_hash, (FieldPath("/source_profile_revision"),)), clock=_CLOCK
+    )
+    missing = admit(session, _request(content_hash, operation="summarize_skill_gaps"), clock=_CLOCK)
 
     assert unknown == AdmissionDenied(
         AdmissionDenial.PROJECTION_PATH_UNKNOWN, (FieldPath("/source_profile_revision"),)
@@ -137,7 +154,7 @@ def test_stored_artifact_hash_mismatch_is_denied_without_session_mutation() -> N
     write_sanitization_record(session, changed, record)
     before = (session.profile_revision, session.sanitized_resume, session.sanitization_record)
 
-    result = admit(session, _request(content_hash))
+    result = admit(session, _request(content_hash), clock=_CLOCK)
 
     assert result == AdmissionDenied(AdmissionDenial.SANITIZATION_HASH_MISMATCH)
     current = (session.profile_revision, session.sanitized_resume, session.sanitization_record)
@@ -151,12 +168,13 @@ def test_required_only_budget_overflow_is_typed_and_optional_values_reduce_exact
         (FieldPath("/summary"), FieldPath("/unclassified/0/text")),
     )
 
-    overflow = admit(session, request, PayloadBudget(1, "budget_priority@1"))
+    overflow = admit(session, request, PayloadBudget(1, "budget_priority@1"), clock=_CLOCK)
     reduced = admit(
         session,
         request,
         PayloadBudget(45, "budget_priority@1"),
         (FieldPath("/summary"),),
+        clock=_CLOCK,
     )
 
     assert isinstance(overflow, BudgetExceeded)
@@ -170,10 +188,15 @@ def test_admission_is_independent_of_caller_path_order(paths: list[str]) -> None
     session, sanitized = _session()
     content_hash = canonical_sha256(sanitized.model_dump(mode="json"))
 
-    first = admit(session, _request(content_hash, tuple(FieldPath(path) for path in paths)))
+    first = admit(
+        session,
+        _request(content_hash, tuple(FieldPath(path) for path in paths)),
+        clock=_CLOCK,
+    )
     second = admit(
         session,
         _request(content_hash, tuple(FieldPath(path) for path in reversed(paths))),
+        clock=_CLOCK,
     )
 
     assert first == second

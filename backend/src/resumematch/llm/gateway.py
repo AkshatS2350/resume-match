@@ -6,8 +6,9 @@ from enum import Enum
 from typing import Protocol, overload, runtime_checkable
 
 from resumematch.core.canonical_json import canonical_sha256
+from resumematch.core.clock import Clock
 from resumematch.core.schemas.sanitized import SanitizedResume
-from resumematch.core.session import Session
+from resumematch.core.session import CloudLLMRequestManifestEntry, Session
 from resumematch.llm.budget import (
     BudgetExceeded,
     PayloadBudget,
@@ -79,6 +80,8 @@ def admit(
     request: ProjectionRequest,
     budget: PayloadBudget = PayloadBudget(10_000, "budget_priority@1"),
     optional_path_priority: tuple[FieldPath, ...] = (),
+    *,
+    clock: Clock,
 ) -> AdmittedPayload | AdmissionDenied | BudgetExceeded: ...
 
 
@@ -87,6 +90,8 @@ def admit(
     request: ProjectionRequest | None = None,
     budget: PayloadBudget = PayloadBudget(10_000, "budget_priority@1"),
     optional_path_priority: tuple[FieldPath, ...] = (),
+    *,
+    clock: Clock | None = None,
 ) -> AdmittedPayload | AdmissionDenied | BudgetExceeded:
     """Admit only exact, resume-root projections from a current sanitized session."""
 
@@ -97,6 +102,8 @@ def admit(
 
     if request is None:
         raise TypeError("request is required for session-backed admission")
+    if clock is None:
+        raise TypeError("clock is required for session-backed admission")
 
     record = operation.sanitization_record
     sanitized = operation.sanitized_resume
@@ -126,7 +133,20 @@ def admit(
         return required
     paths = tuple(sorted(set(request.paths).union(required), key=jsonpointer_sort_key))
     payload = {path: _payload_value(resolve_operation(sanitized, path)) for path in paths}
-    return admit_payload(payload, frozenset(required), budget, optional_path_priority)
+    admitted = admit_payload(payload, frozenset(required), budget, optional_path_priority)
+    if isinstance(admitted, BudgetExceeded):
+        return admitted
+    operation.append_llm_manifest(
+        CloudLLMRequestManifestEntry(
+            manifest_version="cloud_llm_request_manifest@1",
+            operation=request.operation,
+            field_paths=tuple(str(path) for path in admitted.payload),
+            omitted_paths=tuple(str(path) for path in admitted.reduction.dropped_paths),
+            payload_hash=canonical_sha256(dict(admitted.payload)),
+            transmitted_at=clock.now(),
+        )
+    )
+    return admitted
 
 
 def _required_paths(
