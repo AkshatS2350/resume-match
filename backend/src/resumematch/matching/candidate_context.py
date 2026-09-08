@@ -70,8 +70,7 @@ def resolve_candidate_context(
     prior_families = {
         resolve_title_role_family(item.title, resolver)
         for item in sorted(profile.resume.experience, key=lambda value: value.item_id)
-        if item.title is not None
-        and resolve_title_role_family(item.title, resolver) != _UNKNOWN
+        if item.title is not None and resolve_title_role_family(item.title, resolver) != _UNKNOWN
     }
     employer_domains = {
         domain

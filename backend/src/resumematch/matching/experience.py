@@ -21,7 +21,8 @@ def _month_index(value: YearMonth) -> int:
 
 
 def total_relevant_experience(
-    experience: Iterable[ExperienceItem], session_start_date: date,
+    experience: Iterable[ExperienceItem],
+    session_start_date: date,
 ) -> TotalRelevantExperience:
     """Union all dated, at-least-one-month entries using month-granularity math."""
 

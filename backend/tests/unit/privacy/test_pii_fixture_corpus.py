@@ -5,11 +5,21 @@ from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 LABELS = REPOSITORY_ROOT / "fixtures" / "pii" / "LABELS.md"
-ALL_CATEGORIES = frozenset({
-    "person_name", "email", "telephone", "postal_address", "profile_url",
-    "personal_website", "social_handle", "government_identifier",
-    "student_employee_identifier", "date_of_birth", "named_reference",
-})
+ALL_CATEGORIES = frozenset(
+    {
+        "person_name",
+        "email",
+        "telephone",
+        "postal_address",
+        "profile_url",
+        "personal_website",
+        "social_handle",
+        "government_identifier",
+        "student_employee_identifier",
+        "date_of_birth",
+        "named_reference",
+    }
+)
 
 
 def _labels() -> list[tuple[str, str, int, int, str]]:

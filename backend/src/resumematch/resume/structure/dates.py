@@ -11,7 +11,8 @@ from resumematch.core.schemas.candidate import YearMonth
 _MONTHS = {
     name: month
     for month, name in enumerate(
-        ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), 1,
+        ("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"),
+        1,
     )
 }
 _RANGE = re.compile(

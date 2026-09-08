@@ -17,9 +17,7 @@ def postings_query() -> Select[tuple[object, ...]]:
     return select(job_posting).order_by(job_posting.c.internal_id)
 
 
-def current_postings_query(
-    clock: Clock, maximum_age: timedelta
-) -> Select[tuple[object, ...]]:
+def current_postings_query(clock: Clock, maximum_age: timedelta) -> Select[tuple[object, ...]]:
     """Return fresh live cache records plus every fixture record, in stable order."""
     cutoff = clock.now() - maximum_age
     return (

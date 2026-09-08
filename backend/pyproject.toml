@@ -36,3 +36,6 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+markers = [
+    "determinism: deterministic scoring and matching reproducibility properties",
+]

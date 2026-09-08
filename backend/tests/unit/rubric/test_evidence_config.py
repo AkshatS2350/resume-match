@@ -10,8 +10,15 @@ def test_evidence_configs_are_versioned_and_complete() -> None:
     exclusions = yaml.safe_load((ROOT / "proficiency_exclusions.yaml").read_text(encoding="utf-8"))
     assert units["version"] == "units@1"
     groups = (
-        "percent_tokens", "currency_symbols", "currency_codes", "magnitude", "time",
-        "throughput", "data", "electrical", "count",
+        "percent_tokens",
+        "currency_symbols",
+        "currency_codes",
+        "magnitude",
+        "time",
+        "throughput",
+        "data",
+        "electrical",
+        "count",
     )
     assert all(units[group] for group in groups)
     assert exclusions["version"] == "proficiency_exclusions@1"

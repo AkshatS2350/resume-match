@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 from resumematch.api.app import create_app
-from resumematch.core.errors import SessionNotFoundError
+from resumematch.core.errors import ScoringFailedError, SessionNotFoundError
 
 
 class _Body(BaseModel):
@@ -59,3 +59,19 @@ def test_known_pipeline_error_keeps_its_specific_code() -> None:
 
     assert response.status_code == 404
     assert response.json()["code"] == "SESSION_NOT_FOUND"
+
+
+def test_scoring_failure_returns_a_safe_score_stage_envelope() -> None:
+    router = APIRouter()
+
+    @router.get("/score")
+    def score() -> None:
+        raise ScoringFailedError("candidate-derived marker must not escape")
+
+    response = TestClient(create_app(router)).get("/api/v1/score")
+
+    assert response.status_code == 500
+    assert response.json()["code"] == "SCORING_FAILED"
+    assert response.json()["stage"] == "score"
+    assert response.json()["retryable"] is True
+    assert "candidate-derived marker" not in response.text

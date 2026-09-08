@@ -1,0 +1,28 @@
+version: signal_resolvers@1
+resolver_evidence_level_version: resolver_evidence_level@1
+experience_bands:
+  - { band_id: internship, min_months: 0, max_months: 11 }
+  - { band_id: entry, min_months: 0, max_months: 23 }
+  - { band_id: junior, min_months: 12, max_months: 35 }
+  - { band_id: mid, min_months: 36, max_months: 59 }
+  - { band_id: senior, min_months: 60, max_months: 95 }
+  - { band_id: lead, min_months: 96, max_months: null }
+education_targets:
+  - { target_id: any_degree, min_degree_level: bachelors, field_required: false }
+  - { target_id: bachelors_or_higher, min_degree_level: bachelors, field_required: false }
+  - { target_id: masters_or_higher, min_degree_level: masters, field_required: false }
+certification_targets:
+  - { certification_id: cfa_level_1, equivalent_certification_ids: [] }
+closed_flags: [quantified_impact]
+evidence_levels:
+  skill: { canonical_skill_match: 2 }
+  experience_band: { exact_configured_band_match: 3 }
+  education:
+    exact_or_higher_degree_and_exact_field: 3
+    exact_or_higher_degree_related_field: 2
+    degree_only_match: 1
+  certification:
+    exact_configured_certification_match: 3
+    configured_equivalent_certification_match: 2
+  closed_flag:
+    quantified_impact: { explicit_structured_flag_true: 3 }

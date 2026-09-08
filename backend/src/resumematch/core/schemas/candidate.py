@@ -137,6 +137,7 @@ class ProjectItem(ItemBase):
 
 class CertificationItem(ItemBase):
     name: str | None
+    canonical_certification_id: str | None = None
     issuer: str | None
     issued: YearMonth | None
 

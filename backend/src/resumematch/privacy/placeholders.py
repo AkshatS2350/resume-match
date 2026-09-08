@@ -36,9 +36,7 @@ def load_placeholders(path: Path, policy: PiiPolicy) -> Placeholders:
     if not isinstance(tokens, dict) or set(tokens) != set(policy.category_defaults):
         raise PlaceholderConfigError(f"{path}: tokens must match policy categories")
     if not all(
-        isinstance(category, str)
-        and isinstance(token, str)
-        and token == f"[[{category.upper()}]]"
+        isinstance(category, str) and isinstance(token, str) and token == f"[[{category.upper()}]]"
         for category, token in tokens.items()
     ):
         raise PlaceholderConfigError(f"{path}: category-labelled token")

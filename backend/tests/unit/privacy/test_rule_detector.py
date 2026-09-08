@@ -13,8 +13,7 @@ def test_rule_detector_reports_configured_spans_with_exact_slices() -> None:
     text = "Contact alice@example.test, +44 7700 900001, and @candidate_01."
     findings = detector.detect(text)
     actual = [
-        (finding.category, text[finding.start_offset:finding.end_offset])
-        for finding in findings
+        (finding.category, text[finding.start_offset : finding.end_offset]) for finding in findings
     ]
     assert actual == [
         ("email", "alice@example.test"),
@@ -31,9 +30,17 @@ def test_rule_detector_rejects_confidence_outside_the_closed_interval() -> None:
 def test_rule_detector_records_fixture_category_recall() -> None:
     detector = load_rule_detector(ROOT / "config" / "pii_rules.yaml")
     categories = (
-        "person_name", "email", "telephone", "postal_address", "profile_url",
-        "personal_website", "social_handle", "government_identifier",
-        "student_employee_identifier", "date_of_birth", "named_reference",
+        "person_name",
+        "email",
+        "telephone",
+        "postal_address",
+        "profile_url",
+        "personal_website",
+        "social_handle",
+        "government_identifier",
+        "student_employee_identifier",
+        "date_of_birth",
+        "named_reference",
     )
     for category in categories:
         text = (ROOT / "fixtures" / "pii" / category / "carrier.txt").read_text(encoding="utf-8")

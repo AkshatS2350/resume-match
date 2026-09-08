@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[4]
 
 
 def _rubric(skill: str, *, role: str = "role", weight: int = 100) -> str:
-    return f'''schema_version: role_rubric/1
+    return f"""schema_version: role_rubric/1
 rubric_id: test.{role}
 role_id: {role}
 role_family: finance
@@ -26,10 +26,14 @@ categories:
   - category_id: core
     weight: {weight}
     signals:
-      - {{signal_id: known, type: skill, canonical_skill_id: {skill}, weight: 1,
-         min_evidence_level: 1, required: false}}
+      - signal_id: known
+        type: skill
+        target: {{target_type: canonical_skill, target_id: {skill}}}
+        weight: 1
+        min_evidence_level: 1
+        required: false
 penalties: []
-'''
+"""
 
 
 def test_loader_rejects_bad_weight_and_unknown_skill_with_path(tmp_path: Path) -> None:

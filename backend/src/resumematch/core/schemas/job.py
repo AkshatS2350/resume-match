@@ -24,9 +24,12 @@ class ExtractedRequirement(BaseModel):
     start_offset: int
     end_offset: int
     unit_id: str
-    excluded_category: Literal[
-        "work_authorization", "visa_status", "sponsorship", "security_clearance_citizenship"
-    ] | None
+    excluded_category: (
+        Literal[
+            "work_authorization", "visa_status", "sponsorship", "security_clearance_citizenship"
+        ]
+        | None
+    )
     pattern_set_version: str
     delimitation_version: str
 

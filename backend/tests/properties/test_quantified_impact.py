@@ -18,7 +18,7 @@ def test_quantified_impact_reports_an_exclusive_source_range() -> None:
     text = "reduced cost by 40%"
     match = find_quantified_impacts("item-1", text, frozenset({"%"}))[0]
     assert match.item_id == "item-1"
-    assert text[match.start_offset:match.end_offset] == "40%"
+    assert text[match.start_offset : match.end_offset] == "40%"
 
 
 @given(st.integers(min_value=0, max_value=1899), st.sampled_from(("%", "orders")))

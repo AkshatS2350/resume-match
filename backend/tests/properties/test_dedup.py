@@ -10,10 +10,16 @@ from resumematch.core.schemas.job import JobPosting
 
 def _posting(identifier: str, source: str, external: str, hour: int) -> JobPosting:
     return JobPosting(
-        schema_version="job_posting/1", internal_id=identifier, source_id=source,
-        source_external_id=external, company="Example Systems", raw_title="Backend Engineer",
-        raw_description="Description", apply_url="https://example.invalid/jobs/" + identifier,
-        normalized_title="backend engineer", normalized_location="remote",
+        schema_version="job_posting/1",
+        internal_id=identifier,
+        source_id=source,
+        source_external_id=external,
+        company="Example Systems",
+        raw_title="Backend Engineer",
+        raw_description="Description",
+        apply_url="https://example.invalid/jobs/" + identifier,
+        normalized_title="backend engineer",
+        normalized_location="remote",
         ingested_at=datetime(2026, 9, 3, hour, tzinfo=UTC),
     )
 
@@ -21,10 +27,13 @@ def _posting(identifier: str, source: str, external: str, hour: int) -> JobPosti
 def test_deduplicate_keeps_the_latest_same_source_record_and_lowest_cross_source_primary() -> None:
     from resumematch.job.dedup import deduplicate
 
-    result = deduplicate((
-        _posting("b", "fixture", "same", 1), _posting("a", "fixture", "same", 2),
-        _posting("c", "other", "other", 1),
-    ))
+    result = deduplicate(
+        (
+            _posting("b", "fixture", "same", 1),
+            _posting("a", "fixture", "same", 2),
+            _posting("c", "other", "other", 1),
+        )
+    )
 
     assert [posting.internal_id for posting in result] == ["a", "c"]
     assert result[0].is_primary_in_group is True

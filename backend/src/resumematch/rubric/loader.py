@@ -48,12 +48,10 @@ def load_rubrics(directory: Path, aliases: AliasSet) -> RubricLoadResult:
             failures.append(f"{path}: category weights must sum to 100")
             continue
         unknown_skills = sorted(
-            signal.canonical_skill_id
+            signal.target.target_id
             for category in rubric.categories
             for signal in category.signals
-            if signal.type == "skill"
-            and signal.canonical_skill_id is not None
-            and signal.canonical_skill_id not in valid_skills
+            if signal.type == "skill" and signal.target.target_id not in valid_skills
         )
         if unknown_skills:
             failures.append(f"{path}: unknown canonical skill {unknown_skills[0]}")

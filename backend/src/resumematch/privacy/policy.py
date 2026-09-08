@@ -9,11 +9,21 @@ from typing import Final, Literal, cast
 
 import yaml
 
-PII_CATEGORIES: Final = frozenset({
-    "person_name", "email", "telephone", "postal_address", "profile_url",
-    "personal_website", "social_handle", "government_identifier",
-    "student_employee_identifier", "date_of_birth", "named_reference",
-})
+PII_CATEGORIES: Final = frozenset(
+    {
+        "person_name",
+        "email",
+        "telephone",
+        "postal_address",
+        "profile_url",
+        "personal_website",
+        "social_handle",
+        "government_identifier",
+        "student_employee_identifier",
+        "date_of_birth",
+        "named_reference",
+    }
+)
 PolicyDefault = Literal["Remove", "Retain"]
 
 

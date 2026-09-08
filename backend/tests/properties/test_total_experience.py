@@ -10,11 +10,20 @@ from resumematch.matching.experience import total_relevant_experience
 
 def _experience(item_id: str, start: tuple[int, int], end: tuple[int, int]) -> ExperienceItem:
     return ExperienceItem(
-        item_id=item_id, origin="user_provided", extraction_confidence=Decimal("1.00"),
-        confidence_inputs=(), provenance=None, source_text="source", employer="Example",
-        title="Engineer", start_date=YearMonth(year=start[0], month=start[1]),
-        end_date=YearMonth(year=end[0], month=end[1]), is_present=False,
-        duration_months=None, description=None, date_conflict=False,
+        item_id=item_id,
+        origin="user_provided",
+        extraction_confidence=Decimal("1.00"),
+        confidence_inputs=(),
+        provenance=None,
+        source_text="source",
+        employer="Example",
+        title="Engineer",
+        start_date=YearMonth(year=start[0], month=start[1]),
+        end_date=YearMonth(year=end[0], month=end[1]),
+        is_present=False,
+        duration_months=None,
+        description=None,
+        date_conflict=False,
     )
 
 

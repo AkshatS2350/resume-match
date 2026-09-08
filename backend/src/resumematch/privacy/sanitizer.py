@@ -43,7 +43,7 @@ class Sanitizer:
         redacted = value
         for span in reversed(spans):
             token = self.placeholders.tokens[span.category]
-            redacted = redacted[:span.start_offset] + token + redacted[span.end_offset:]
+            redacted = redacted[: span.start_offset] + token + redacted[span.end_offset :]
         fail_safe_count = sum(
             span.confidence < self.policy.minimum_classification_confidence for span in spans
         )

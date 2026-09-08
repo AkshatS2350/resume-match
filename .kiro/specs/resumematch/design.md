@@ -744,6 +744,10 @@ class ProjectionRequest(BaseModel):
 
 There is no field on `ProjectionRequest` that can carry a candidate-derived *value*. A caller cannot supply a truncated, concatenated, paraphrased, or invented value because the type has nowhere to put one. The gateway resolves every path against the Session's Sanitized_Resume itself. RM-PRIV-003 c2's projection check is therefore satisfied *by construction*, and the explicit check below is defence in depth against a future schema change.
 
+**Operation payload path root.** Paths declared by an `LLMOperationSpec` are relative to
+`SanitizedResume.resume`, not the outer `SanitizedResume` wrapper. The wrapper remains trusted
+internal metadata for revision and hash checks and is never an implicit LLM payload source.
+
 **Admission algorithm (RM-PRIV-003 c2, c3, c5, c9, c10):**
 
 ```text
@@ -855,16 +859,18 @@ Everything else candidate-derived is eligible. **Omission priority order** (`con
 "Descending index" means the highest array index is omitted first, which is deterministic given a fixed profile and preserves the leading (most recent, by the Structurer's ordering) entries.
 
 ```text
-reduce_to_budget(paths, required, budget) -> (paths, omissions) | (None, _)
+reduce_to_budget(payload, required_paths, budget) -> ReducedPayload | BudgetExceeded
+  # payload is a value-bearing mapping of already-sanitized, operation-approved paths.
+  # Its size is len(canonical_json(included_payload)), never a path-count or token estimate.
+  # Required paths are non-droppable; BudgetExceeded is returned if they alone do not fit.
   omissions := []
-  while measure(render(paths)) > budget:
-      victim := first path in expand(priority_order) that is in paths and not in required
-      if victim is None: return (None, omissions)          # c6 last clause → guidance_unavailable
-      paths.remove(victim); omissions.append((victim, "omitted_for_budget"))
-  return (sorted(paths, key=jsonpointer_sort_key), tuple(omissions))
+  for optional path in operation_spec.optional_path_priority:
+      include it only when canonical_json(included_payload + path) fits budget
+      otherwise omissions.append((path, "omitted_for_budget"))
+  return included_payload, omissions
 ```
 
-`measure` is the character length of the rendered request payload (D-28). Determinism holds because `expand(priority_order)` is a total order over concrete paths for a given profile, and the loop is deterministic given identical inputs and budget — which is exactly RM-LLM-003 c6's determinism clause. Every included path's value is still `resolve(sanitized, p)`, untouched, so the reduced request remains admissible under RM-PRIV-003 c2, satisfying c12.
+`measure` is `len(canonical_json(included_payload))`, the character length of the canonical rendered request payload (D-28). `PayloadPath`, `PayloadValue`, `PayloadBudget`, and `ReducedPayload` are typed gateway contracts; values are already sanitized and operation-approved. Determinism holds because optional priority is a total order and canonical JSON sorts keys. Every included path's value is still `resolve(sanitized, p)`, untouched, so the reduced request remains admissible under RM-PRIV-003 c2, satisfying c12.
 
 ### Local versus cloud model flow
 
@@ -1117,14 +1123,14 @@ categories:
     signals:
       - signal_id: excel_modeling
         type: skill                  # skill|experience_band|education|certification|flag
-        canonical_skill_id: excel
+        target: { target_type: canonical_skill, target_id: excel }
         weight: 10
         min_evidence_level: 2
         required: true               # RM-SCORE-001 c7
         penalty_points: 8
       - signal_id: financial_statements
         type: skill
-        canonical_skill_id: financial_statement_analysis
+        target: { target_type: canonical_skill, target_id: financial_statement_analysis }
         weight: 8
         min_evidence_level: 1
         required: false
@@ -1156,6 +1162,31 @@ penalties:                           # rubric-level penalties, applied to a name
 
 The `condition.kind` vocabulary is a **closed enumeration** interpreted by the engine: `no_item_in_section`, `signal_below_level`, `all_signals_absent_in_category`, `total_experience_below`. A rubric cannot express arbitrary logic, which is what keeps RM-EXT-001 c5 (no community executable code) true and keeps the engine free of rubric-specific branches.
 
+**Typed signal targets and resolver evidence policy (Task 26.2).** Every signal carries
+`SignalTargetRef(target_type, target_id)`, where the closed target types are
+`canonical_skill`, `experience_band`, `education_requirement`, `certification`, and
+`closed_flag`. The target type must match the signal type; v1's closed flag vocabulary is
+only `quantified_impact`. `config/signal_resolvers.yaml`, version `signal_resolvers@1`,
+defines the permitted experience bands, education and certification targets, and the
+`resolver_evidence_level@1` table. Resolvers receive only a frozen `ScoringContext` of
+approved target/config metadata and structured item identifiers, confidence, normalized
+identifiers, durations, degree levels, and explicit flag values—never raw resume text or
+an arbitrary mapping. A matching skill, exact experience band, exact certification, and
+explicit `quantified_impact` use their configured levels; education uses its configured
+exact-field, related-field, or degree-only level. An unknown target or absent required
+parsed field is indeterminate; parsed absent evidence is determinable at level 0. No
+resolver performs free-text, fuzzy, provider, web, or LLM inference.
+
+**Penalty applicability (Task 26.4).** `PenaltyApplicabilityContext` is frozen and
+raw-text-free. It carries exactly one non-negative structured count for each closed
+candidate section and an optional total relevant experience month count. A
+`no_item_in_section` penalty applies only to a declared closed section with count zero.
+A `total_experience_below` penalty applies only when a configured non-negative month
+threshold exceeds a present total; an unknown total never triggers it. No penalty
+applicability logic reads resume text or derives facts from titles, employers, or prose.
+`PenaltyCondition.threshold_months` is a strict non-negative integer required only for
+`total_experience_below`; `section` is required only for `no_item_in_section`.
+
 JSON Schema is generated from the Pydantic model by `tools/export_schemas.py` into `docs/schemas/role_rubric.schema.json` (RM-RUB-001 c7). Loader validations: weights sum to 100 (c3); every `type: skill` signal resolves in the alias file (c4); duplicate `(role_id, domain_id, seniority_id)` across files fails the load and reports both paths (RM-RUB-002 c5); startup validates all files and continues serving the valid ones (RM-RUB-002 c1, c2); files are read-only at runtime with an explicit reload endpoint (RM-RUB-002 c4).
 
 #### Rubric_Engine — the single scoring code path (RM-SCORE-001, RM-RUB-001 c5)
@@ -1181,7 +1212,7 @@ RESOLVERS: Mapping[SignalType, SignalResolver] = {
 ```text
 score(profile, rubric, cfg) -> ReadinessResult:
   evidence := evidence_assigner.assign(profile, rubric.referenced_skill_ids, session_start)
-  ctx := ScoringContext(profile, evidence, cfg.multipliers, clock=injected)
+  ctx := ScoringContext(approved_structured_evidence, rubric_targets, config_versions)
   reported := {}
   for category in sorted(rubric.categories, key=lambda c: c.category_id):
       earned := Decimal(0); attainable := Decimal(0)

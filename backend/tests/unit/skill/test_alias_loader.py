@@ -20,9 +20,17 @@ def test_duplicate_folded_alias_names_both_entries(tmp_path: Path) -> None:
     path.write_text(
         "\n".join(
             (
-                "version: skills@1", "skills:", "  - id: python", "    display: Python",
-                "    categories: [language]", "    aliases: [py]", "  - id: pypi",
-                "    display: PyPI", "    categories: [tool]", "    aliases: [PY]", "",
+                "version: skills@1",
+                "skills:",
+                "  - id: python",
+                "    display: Python",
+                "    categories: [language]",
+                "    aliases: [py]",
+                "  - id: pypi",
+                "    display: PyPI",
+                "    categories: [tool]",
+                "    aliases: [PY]",
+                "",
             )
         ),
         encoding="utf-8",

@@ -1,0 +1,22 @@
+version: budget_priority@1
+max_rendered_characters: 10000
+optional_path_priority:
+  - pattern: /achievements/*
+    index_direction: descending
+  - pattern: /education/*/coursework/*
+    index_direction: descending
+  - pattern: /certifications/*/issuer
+    index_direction: descending
+  - pattern: /projects/*/description
+    index_direction: descending
+  - pattern: /summary
+  - pattern: /experience/*/description
+    index_direction: descending
+  - pattern: /projects/*
+    index_direction: descending
+  - pattern: /education/*
+    index_direction: descending
+  - pattern: /certifications/*
+    index_direction: descending
+  - pattern: /experience/*
+    index_direction: descending

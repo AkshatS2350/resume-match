@@ -1,9 +1,9 @@
 """Closed declarative schema for role rubrics."""
 
 from decimal import Decimal
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class ExperienceBand(BaseModel):
@@ -28,15 +28,47 @@ class CertificationExpectation(BaseModel):
     weight: Decimal
 
 
+SignalTargetType = Literal[
+    "canonical_skill",
+    "experience_band",
+    "education_requirement",
+    "certification",
+    "closed_flag",
+]
+
+
+class SignalTargetRef(BaseModel):
+    """A closed, typed target for a deterministic signal resolver."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    target_type: SignalTargetType
+    target_id: str
+
+
 class Signal(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
     signal_id: str
     type: Literal["skill", "experience_band", "education", "certification", "flag"]
-    canonical_skill_id: str | None = None
+    target: SignalTargetRef
     weight: Decimal
     min_evidence_level: int
     required: bool
     penalty_points: Decimal | None = None
+
+    @model_validator(mode="after")
+    def target_matches_signal_type(self) -> Self:
+        expected = {
+            "skill": "canonical_skill",
+            "experience_band": "experience_band",
+            "education": "education_requirement",
+            "certification": "certification",
+            "flag": "closed_flag",
+        }
+        if self.target.target_type != expected[self.type]:
+            raise ValueError("target_type must match signal type")
+        if self.type == "flag" and self.target.target_id != "quantified_impact":
+            raise ValueError("unknown closed flag")
+        return self
 
 
 class AlternativeGroup(BaseModel):
@@ -51,10 +83,32 @@ class AlternativeGroup(BaseModel):
 class PenaltyCondition(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
     kind: Literal[
-        "no_item_in_section", "signal_below_level", "all_signals_absent_in_category",
+        "no_item_in_section",
+        "signal_below_level",
+        "all_signals_absent_in_category",
         "total_experience_below",
     ]
-    section: str | None = None
+    section: (
+        Literal[
+            "skills",
+            "experience",
+            "education",
+            "projects",
+            "certifications",
+            "achievements",
+            "unclassified",
+        ]
+        | None
+    ) = None
+    threshold_months: int | None = Field(default=None, ge=0, strict=True)
+
+    @model_validator(mode="after")
+    def validates_required_condition_fields(self) -> Self:
+        if self.kind == "no_item_in_section" and self.section is None:
+            raise ValueError("section is required for no_item_in_section")
+        if self.kind == "total_experience_below" and self.threshold_months is None:
+            raise ValueError("threshold_months is required for total_experience_below")
+        return self
 
 
 class RubricPenalty(BaseModel):

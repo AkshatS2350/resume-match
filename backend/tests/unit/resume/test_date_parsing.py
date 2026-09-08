@@ -5,11 +5,23 @@ import pytest
 from resumematch.resume.structure.dates import parse_experience_dates
 
 
-@pytest.mark.parametrize("text", [
-    "Jan 2023 – Present", "2021-2022", "06/2020 to 08/2020", "January 2020 - March 2021",
-    "Feb 2019–Apr 2020", "2018 to 2019", "03/2018 - 04/2018", "May 2017 - Present",
-    "2020–Present", "September 2021 to December 2021", "07/2022 - Present", "2016 - 2017",
-])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Jan 2023 – Present",
+        "2021-2022",
+        "06/2020 to 08/2020",
+        "January 2020 - March 2021",
+        "Feb 2019–Apr 2020",
+        "2018 to 2019",
+        "03/2018 - 04/2018",
+        "May 2017 - Present",
+        "2020–Present",
+        "September 2021 to December 2021",
+        "07/2022 - Present",
+        "2016 - 2017",
+    ],
+)
 def test_recognized_date_ranges_parse_deterministically(text: str) -> None:
     parsed = parse_experience_dates(text, date(2026, 1, 1))
     assert parsed.start_date is not None

@@ -6,10 +6,17 @@ from resumematch.core.schemas.job import ExtractedRequirement
 
 def _requirement(**changes: object) -> ExtractedRequirement:
     data: dict[str, object] = {
-        "requirement_id": "req-1", "classification": "required", "low_confidence": False,
-        "canonical_skill_id": "python", "unit_text": "Python", "start_offset": 0,
-        "end_offset": 6, "unit_id": "unit-1", "excluded_category": None,
-        "pattern_set_version": "patterns@1", "delimitation_version": "delim@1",
+        "requirement_id": "req-1",
+        "classification": "required",
+        "low_confidence": False,
+        "canonical_skill_id": "python",
+        "unit_text": "Python",
+        "start_offset": 0,
+        "end_offset": 6,
+        "unit_id": "unit-1",
+        "excluded_category": None,
+        "pattern_set_version": "patterns@1",
+        "delimitation_version": "delim@1",
     }
     data.update(changes)
     return ExtractedRequirement.model_validate(data)

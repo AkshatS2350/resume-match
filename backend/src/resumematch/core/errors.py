@@ -83,6 +83,15 @@ for _code in ErrorCode:
 
 del _code
 
+
+class ScoringFailedError(PipelineError):
+    """Safe failure boundary for deterministic readiness scoring."""
+
+    code = ErrorCode.SCORING_FAILED
+
+    def __init__(self, _: str = "", *, context: Mapping[str, str | int] | None = None) -> None:
+        super().__init__("Scoring failed. Please try again.", context=context)
+
 # Publicly named today; the remaining fail-closed types are introduced by their
 # owning pipeline tasks using the same closed-code mechanism above.
 SessionNotFoundError: type[PipelineError] = _error_type(

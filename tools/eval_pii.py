@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import json
 import sys
-from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend" / "src"))
 
-from resumematch.privacy.detectors.rules import Detection, load_rule_detector  # noqa: E402
+from resumematch.privacy.detectors.rules import load_rule_detector  # noqa: E402
 
 _CATEGORIES = (
     "person_name", "email", "telephone", "postal_address", "profile_url",

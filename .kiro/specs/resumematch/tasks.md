@@ -492,14 +492,14 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-PARSE-003 c1; RM-SKILL-001 c6; RM-PARSE-005 c4_ · _Design: Component diagram (`Struct → SNorm`); D-39_
   - Done when: a test asserts a resume listing `JS`, `JavaScript`, and `Javascript` yields three `SkillItem`s whose `canonical_skill_id` values are all equal and whose `surface` values differ; a test asserts an unrecognized surface yields `unmapped:<fold>` and preserves the original string.
 
-- [ ] 12.5 [P0] Assemble the `Resume_Structurer` and assert it never calls a provider
+- [x] 12.5 [P0] Assemble the `Resume_Structurer` and assert it never calls a provider
   - Files: `backend/src/resumematch/resume/structure/__init__.py`, `backend/tests/properties/test_structurer.py`
   - Work: compose section assignment, date parsing, confidence, and skill resolution into `structure(extracted: ExtractedText, session_start_date: date) -> StructuredResume`. Populate all seven sections plus `unclassified`, using empty tuples where absent. Attach `Provenance` to every item.
   - Depends on: 12.1, 12.2, 12.3, 12.4, 5.2
   - _Requirements: RM-PARSE-003 c1, c2, c5, c6; RM-PARSE-005 c1_ · _Design: Resume_Structurer_ · _Property: 1, 3, 4, 6_
   - Done when: structuring each fixture twice produces byte-identical `model_dump_json()`; every item's provenance slice reproduces its `source_text`; a test with `CountingStubProvider` asserts zero invocations across all ten fixtures; every source `block_id` appears in exactly one section.
 
-- [ ] 12.6 [P0] Implement the profile draft endpoint
+- [x] 12.6 [P0] Implement the profile draft endpoint
   - Files: `backend/src/resumematch/api/routers/profile.py`, `backend/src/resumematch/api/dto/profile.py`, `backend/tests/integration/test_profile_draft.py`
   - Work: `POST /api/v1/sessions/profile/draft` structuring the Session's `ExtractedText`, storing the `StructuredResume` in Session state, and returning it with per-item `source_text` and the `schema_version`.
   - Depends on: 12.5, 9.7
@@ -661,30 +661,30 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 18. Cloud boundary — the gateway admission and budget machinery
 
-- [ ] 18.1 [P0] Implement `llm/projection.py` — JSON Pointer paths and the value-free `ProjectionRequest`
+- [x] 18.1 [P0] Implement `llm/projection.py` — JSON Pointer paths and the value-free `ProjectionRequest`
   - Files: `backend/src/resumematch/llm/projection.py`, `backend/tests/unit/llm/test_projection_request.py`
   - Work: `FieldPath` as an RFC 6901 JSON Pointer over the canonical `Sanitized_Resume`; `resolves(sanitized, path)` and `resolve(sanitized, path)`; a `jsonpointer_sort_key`. `ProjectionRequest` frozen with `extra="forbid"` and exactly the design's fields — `operation`, `sanitization_content_hash`, `paths`, `evidence_item_ids`, `permitted_skill_ids`, `non_candidate_context`. **No field may carry a candidate-derived value.**
   - Depends on: 17.4, 3.1
   - _Requirements: RM-PRIV-003 c2, c8; RM-LLM-003 c6_ · _Design: The projection mechanism; D-06, D-07_
   - Done when: a test enumerates every field of `ProjectionRequest` and asserts none has a type that could hold a candidate-derived string value other than an identifier or a pointer; a test asserts an array-index pointer such as `/experience/0/title` resolves; a test asserts an unresolvable pointer returns false rather than raising.
 
-- [ ] 18.2 [P0] Implement the admission algorithm
+- [x] 18.2 [P0] Implement the admission algorithm
   - Files: `backend/src/resumematch/llm/gateway.py`, `backend/tests/properties/test_admission.py`
-  - Work: the design's ten-step `admit(session, req)` — absent record → `SANITIZATION_INCOMPLETE`; revision mismatch → `SANITIZATION_STALE`; hash mismatch against the request → `SANITIZATION_HASH_MISMATCH`; re-hash of the stored `Sanitized_Resume` mismatching the record → `SANITIZATION_HASH_MISMATCH`; unknown paths → `PROJECTION_PATH_UNKNOWN` naming paths only; union with the operation's schema-required paths; budget reduction; resolve values from the Session, never from the caller; append the manifest entry; return the admitted payload. Sanitized status is read solely from the record and never from a caller-supplied marker, flag, or header.
+  - Work: the design's ten-step `admit(session, req)` — absent record → `SANITIZATION_INCOMPLETE`; revision mismatch → `SANITIZATION_STALE`; hash mismatch against the request → `SANITIZATION_HASH_MISMATCH`; re-hash of the stored `Sanitized_Resume` mismatching the record → `SANITIZATION_HASH_MISMATCH`; unknown paths → `PROJECTION_PATH_UNKNOWN` naming paths only; union with the operation's schema-required paths; budget reduction; resolve operation paths relative to `SanitizedResume.resume`, never from caller values or outer-wrapper metadata; append the manifest entry; return the admitted payload. Sanitized status is read solely from the record and never from a caller-supplied marker, flag, or header.
   - Depends on: 18.1, 3.8, 3.6
   - _Requirements: RM-PRIV-003 c2, c3, c5, c9, c10_ · _Design: Admission algorithm_ · _Property: 21, 22_
   - Done when: a Hypothesis test over path subsets asserts the admitted payload contains exactly the requested plus schema-required paths and that every value equals `resolve(sanitized, p)`; a test asserts a caller-supplied `sanitized: true` marker is ignored; a test asserts each rejection path emits telemetry containing field-path names only and leaves the Session's canonical JSON byte-identical; a test asserts `CountingStubProvider.invocations == 0` on every rejection.
 
-- [ ] 18.3 [P0] Implement the operation specs and the ineligible-path declarations
+- [x] 18.3 [P0] Implement the operation specs and the ineligible-path declarations
   - Files: `backend/src/resumematch/llm/schemas/operations.py`, `backend/tests/unit/llm/test_operation_specs.py`
-  - Work: `LLMOperationSpec` binding each of the five operations to its response model and its `required_candidate_paths` tuple, populated exactly from the design's table. Ineligibility is derived from the spec, never maintained as a separate list.
+  - Work: `LLMOperationSpec` binding each of the five operations to its response model and its `required_candidate_paths` tuple, populated exactly from the design's table. Operation-spec paths are relative to `SanitizedResume.resume`; ineligibility is derived from the spec, never maintained as a separate list.
   - Depends on: 18.1
   - _Requirements: RM-LLM-003 c6; RM-PRIV-003 c12_ · _Design: Budget-driven omission; D-29_
   - Done when: a test asserts all five operations have a spec; a test asserts each spec's `required_candidate_paths` matches the design's table entry exactly; a test asserts no module holds a second hard-coded ineligibility list.
 
-- [ ] 18.4 [P0] Write `config/llm_budget_priority.yaml` and implement `reduce_to_budget`
+- [x] 18.4 [P0] Write `config/llm_budget_priority.yaml` and implement `reduce_to_budget`
   - Files: `config/llm_budget_priority.yaml`, `backend/src/resumematch/llm/budget.py`, `backend/tests/properties/test_budget_reduction.py`
-  - Work: the ten-rank ordered pattern list from the design, with descending-index direction where stated, version `budget_priority@1`. `reduce_to_budget(paths, required, budget)` omits whole field paths or whole evidence items in that order until the rendered character length fits, never altering a value at an included path, and returns `None` (mapped to `guidance_unavailable`, reason `budget_exhausted`) when no eligible omission remains.
+  - Work: the ten-rank ordered pattern list from the design, with descending-index direction where stated, version `budget_priority@1`. `reduce_to_budget(payload, required_paths, budget)` accepts a typed, already-sanitized, operation-approved value-bearing payload and measures `len(canonical_json(included_payload))`. It omits optional whole field paths or whole evidence items in declared deterministic priority order, never altering an included value. Required paths are non-droppable; if they alone exceed the budget it returns a deterministic `BudgetExceeded` result (mapped to `guidance_unavailable`, reason `budget_exhausted`).
   - Depends on: 18.3, 3.3
   - _Requirements: RM-LLM-003 c6; RM-PRIV-003 c12; C-6_ · _Design: Budget-driven omission; D-28, D-29_ · _Property: 23_
   - Done when: a Hypothesis test over projections and budgets asserts either the result fits the budget with every included value untouched, or `guidance_unavailable` with reason `budget_exhausted`; asserts no path in `required_candidate_paths` is ever omitted; asserts the omission sequence matches the configured priority order; asserts identical inputs and budget produce an identical reduced request; asserts every omission is recorded with reason `omitted_for_budget`.
@@ -907,16 +907,16 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 26. Rubric engine
 
-- [ ] 26.1 [P0] Implement the `SignalResolver` protocol and the resolver registry
+- [x] 26.1 [P0] Implement the `SignalResolver` protocol and the resolver registry
   - Files: `backend/src/resumematch/rubric/resolvers/__init__.py`, `backend/tests/unit/rubric/test_resolver_registry.py`
   - Work: the `SignalResolver` protocol with a `signal_type` class variable and `resolve(signal, ctx) -> ResolvedSignal`, and a `RESOLVERS` mapping keyed by signal type only. `ResolvedSignal` carries `evidence_level`, `determinability`, and `supporting_item_ids`.
   - Depends on: 24.1, 23.4
   - _Requirements: RM-RUB-001 c5_ · _Design: D-19_
   - Done when: a test asserts `RESOLVERS` keys equal the `SignalType` enum members exactly; a test asserts the registry is keyed by type and by nothing else.
 
-- [ ] 26.2 [P0] Implement the five signal resolvers with determinability recording
+- [x] 26.2 [P0] Implement the five signal resolvers with determinability recording
   - Files: `backend/src/resumematch/rubric/resolvers/{skill,experience_band,education,certification,flag}.py`, `backend/tests/properties/test_determinability.py`
-  - Work: one resolver per signal type. Each records `determinability` as `indeterminate` when and only when one of exactly three conditions holds — a required profile field is absent or failed to parse; the signal's sole supporting item has `extraction_confidence` below 0.60 and the user has not confirmed that item; a skill-type signal resolves to no canonical skill — and `determinable` in every other case, including a signal determined absent on parsed evidence.
+  - Work: one resolver per signal type. Signals use the design's closed typed target reference and `signal_resolvers@1` / `resolver_evidence_level@1`; no resolver reads raw resume text. Each records `determinability` as `indeterminate` when and only when one of exactly three conditions holds — a required profile field is absent or failed to parse; the signal's sole supporting item has `extraction_confidence` below 0.60 and the user has not confirmed that item; a skill-type signal resolves to no canonical skill — and `determinable` in every other case, including a signal determined absent on parsed evidence. Matched non-skill levels come only from the versioned resolver evidence table.
   - Depends on: 26.1, 23.4
   - _Requirements: RM-CONF-001 c8_ · _Design: `determinability` is recorded by the resolvers_ · _Property: 17_
   - Done when: a Hypothesis test asserts `indeterminate` is recorded exactly under the three conditions and never otherwise; a test asserts a skill the engine determines to be absent from parsed evidence is recorded `determinable`; a test asserts a user-confirmed low-confidence item yields `determinable`.
@@ -928,21 +928,21 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-SCORE-001 c9; RM-MATCH-001 c6_ · _Design: D-18_ · _Property: 15_
   - Done when: a test asserts `quantize_half_up(Decimal("2.5")) == 3` and `quantize_half_up(Decimal("3.5")) == 4` (half up, not banker's); a Hypothesis test asserts `sum_sorted` is invariant under input permutation; `tools/check_determinism.py` reports no `float(` or `round(` in `rubric/` or `matching/`.
 
-- [ ] 26.4 [P0] Implement the `Rubric_Engine` scoring loop
+- [x] 26.4 [P0] Implement the `Rubric_Engine` scoring loop
   - Files: `backend/src/resumematch/rubric/engine.py`, `backend/tests/properties/test_rubric_engine.py`
-  - Work: the design's `score(profile, rubric, cfg)` — per category, iterate signals in sorted `signal_id` order accumulating earned and attainable points with the highest multiplier; award 0 earned points to a signal below its declared minimum level and record the missing-required penalty where the signal is required; credit each alternative group exactly once from the highest qualifying member with a lexicographic tiebreak, counting it once toward attainable and recording the crediting member; raw score 0 without a division where attainable is 0; subtract applicable penalties then clamp to `[0, 100]`; overall as the clamped weighted sum of the reported category scores; round reported values half up and nothing intermediate. No provider call, no clock.
+  - Work: the design's `score(profile, rubric, cfg)` with its typed raw-text-free penalty applicability context — per category, iterate signals in sorted `signal_id` order accumulating earned and attainable points with the highest multiplier; award 0 earned points to a signal below its declared minimum level and record the missing-required penalty where the signal is required; credit each alternative group exactly once from the highest qualifying member with a lexicographic tiebreak, counting it once toward attainable and recording the crediting member; raw score 0 without a division where attainable is 0; subtract applicable penalties then clamp to `[0, 100]`; overall as the clamped weighted sum of the reported category scores; round reported values half up and nothing intermediate. No provider call, no clock.
   - Depends on: 26.2, 26.3, 23.5, 24.2
   - _Requirements: RM-SCORE-001 c1–c9, c12; RM-SCORE-003 c1, c2_ · _Design: Rubric_Engine scoring loop_ · _Property: 1, 3, 12, 13, 15_
   - Done when: Hypothesis tests over `role_rubrics()` and `candidate_profiles()` assert each reported category score equals the penalty-adjusted clamped formula result, the overall equals the clamped weighted sum, every reported value lies in `[0, 100]`, a zero-attainable category scores 0 without a division, and a qualifying alternative group contributes exactly once from its highest qualifying member while its non-crediting members contribute nothing; repeated scoring produces identical output; `CountingStubProvider` records zero invocations.
 
-- [ ] 26.5 [P0] Implement the no-evidence and below-reportable reason distinction
+- [x] 26.5 [P0] Implement the no-evidence and below-reportable reason distinction
   - Files: `backend/src/resumematch/rubric/engine.py`, `backend/tests/unit/rubric/test_no_evidence_reason.py`
   - Work: return `no_evidence` with a matched-signal count of 0 for every category when no declared signal is matched at Level 1 or higher; return `below_reportable_or_penalized` with a matched-signal count greater than 0 when at least one signal is matched and the rounded overall is 0. Never an error in either case.
   - Depends on: 26.4
   - _Requirements: RM-SCORE-001 c10, c11_ · _Design: `no_evidence_reason`_
   - Done when: a test with the empty profile fixture asserts score 0, reason `no_evidence`, and a per-category matched count of 0; a test with one Level 1 match and a penalty large enough to zero the score asserts reason `below_reportable_or_penalized` and a matched count above 0; neither raises.
 
-- [ ] 26.6 [P0] Add the scoring-determinism reproducibility fields and the `determinism` gate content
+- [x] 26.6 [P0] Add the scoring-determinism reproducibility fields and the `determinism` gate content
   - Files: `backend/src/resumematch/rubric/engine.py`, `backend/tests/properties/determinism/test_scoring_determinism.py`, `.github/workflows/ci.yml`
   - Work: return the rubric version and the engine version alongside every score via `VersionStamp`. Map a scoring exception to HTTP 500 `SCORING_FAILED` with a telemetry event carrying no candidate data. Add the `determinism` gate job content: `tools/check_determinism.py`, `tools/check_no_domain_branch.py`, and the determinism and permutation property tests.
   - Depends on: 26.4, 3.4, 2.6, 2.7
@@ -987,7 +987,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 29. Readiness explainability and endpoint
 
-- [ ] 29.1 [P0] Define the readiness result models
+- [x] 29.1 [P0] Define the readiness result models
   - Files: `backend/src/resumematch/core/schemas/readiness.py`, `backend/tests/properties/test_readiness_models.py`
   - Work: `ReadinessResult` (frozen: `readiness_score`, `reason`, `matched_signal_count`, `categories`, `missing_required`, `factor_decomposition`, `confidence`, `versions`), `CategoryResult` (`category_id`, `weight`, `score`, `matched_signals`, `missing_signals`, `applied_penalties`), `MatchedSignal` (with `evidence_level` and supporting item identifiers), `MissingSignal` (distinguishing absent entirely from present below the required level), `AppliedPenalty`, `FactorContribution`.
   - Depends on: 26.4, 3.4
@@ -1973,13 +1973,13 @@ Wave-level. Each wave below is a set of tasks with no dependency on each other, 
     },
     {
       "wave": 13,
-      "tasks": ["9.8", "12.5", "17.5", "18.1", "25.6", "26.5", "26.6", "27.1", "28.2", "29.1", "37.7", "42.2", "42.3"],
-      "description": "Assembled `Resume_Structurer`, the sanitize endpoint, the gateway projection, the single-code-path proof, the `determinism` gate content, the `Decimal` spike (27.1), and the readiness models."
+      "tasks": ["9.8", "12.5", "18.1", "26.5", "26.6", "29.1"],
+      "description": "Assembled `Resume_Structurer`, the gateway projection, the no-evidence distinction, the `determinism` gate content, and the readiness models. Tasks requiring incomplete profile, rubric, extension, ingestion, or requirement-extraction prerequisites are deferred to later dependency-valid waves."
     },
     {
       "wave": 14,
-      "tasks": ["12.6", "18.2", "18.3", "20.2", "29.2", "31.2", "45.5", "46.1"],
-      "description": "Profile draft endpoint, the admission algorithm, the candidate-data leak gate, the readiness factor decomposition, `Confidence_Calculator`, and per-dimension enablement."
+      "tasks": ["12.6", "18.2", "18.3", "20.2", "25.6", "27.1", "28.2", "29.2", "31.2", "37.7", "42.2", "42.3", "45.5", "46.1"],
+      "description": "Profile draft endpoint, admission and candidate-data leak gates, the deferred single-code-path proof and Decimal spike after reference rubrics, extension coverage after rubric metadata, readiness factor decomposition, deferred ingestion CLI after source and extraction gates, incomplete-description follow-ons, `Confidence_Calculator`, and per-dimension enablement."
     },
     {
       "wave": 15,
@@ -1988,8 +1988,8 @@ Wave-level. Each wave below is a set of tasks with no dependency on each other, 
     },
     {
       "wave": 16,
-      "tasks": ["13.2", "13.3", "21.1", "47.1"],
-      "description": "Scoring gated on a confirmed profile, the Profile_Review_UI, the pending-request endpoints, and the once-per-requirement hard-requirement penalty."
+      "tasks": ["13.2", "13.3", "17.5", "21.1", "47.1"],
+      "description": "Scoring gated on a confirmed profile, the Profile_Review_UI, the sanitize and sanitized-resume endpoints after the real CandidateProfile session chain, the pending-request endpoints, and the once-per-requirement hard-requirement penalty."
     },
     {
       "wave": 17,
