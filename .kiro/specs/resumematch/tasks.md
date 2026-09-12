@@ -847,7 +847,7 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-RUB-001 c3, c4; RM-RUB-002 c1, c2, c5_ · _Design: Rubric_Loader validations_
   - Done when: unit tests assert each of the three rejections with the expected error content; a test with one invalid and two valid rubric files asserts startup succeeds, the invalid rubric returns `RUBRIC_UNAVAILABLE` on a readiness request, and the two valid rubrics score normally.
 
-- [ ] 24.3 [P0] Export the rubric JSON Schema and add the config-validation CI job
+- [x] 24.3 [P0] Export the rubric JSON Schema and add the config-validation CI job
   - Files: `tools/export_schemas.py`, `docs/schemas/role_rubric.schema.json`, `.github/workflows/ci.yml`
   - Work: generate `role_rubric.schema.json` from the Pydantic model. Add a `config-validate` CI job that validates every rubric file, the alias file, and (later) the source registry, failing on any validation error.
   - Depends on: 24.2, 4.6

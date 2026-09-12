@@ -20,7 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: test -f config/README.md
+      - uses: astral-sh/setup-uv@v5
+      - run: uv run --project backend python tools/export_schemas.py
+      - run: git diff --exit-code docs/schemas web/src/lib/api/generated
+      - run: uv run --project backend python tools/validate_rubric_config.py
   properties:
     runs-on: ubuntu-latest
     steps:

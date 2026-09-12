@@ -67,6 +67,18 @@
     "CertificationItem": {
       "additionalProperties": false,
       "properties": {
+        "canonical_certification_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Canonical Certification Id"
+        },
         "confidence_inputs": {
           "items": {
             "type": "string"

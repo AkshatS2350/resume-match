@@ -1,6 +1,127 @@
 {
   "components": {
     "schemas": {
+      "AchievementItem-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "extraction_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Extraction Confidence"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "text"
+        ],
+        "title": "AchievementItem",
+        "type": "object"
+      },
+      "AchievementItem-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "extraction_confidence": {
+            "title": "Extraction Confidence",
+            "type": "string"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "text"
+        ],
+        "title": "AchievementItem",
+        "type": "object"
+      },
       "Body_upload_resume_api_v1_sessions_resume_post": {
         "properties": {
           "file": {
@@ -13,6 +134,824 @@
           "file"
         ],
         "title": "Body_upload_resume_api_v1_sessions_resume_post",
+        "type": "object"
+      },
+      "CandidateProfile": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "title": "Confirmed",
+            "type": "boolean"
+          },
+          "profile_revision": {
+            "title": "Profile Revision",
+            "type": "integer"
+          },
+          "resume": {
+            "$ref": "#/components/schemas/StructuredResume-Output"
+          },
+          "schema_version": {
+            "const": "candidate_profile/1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "session_start_date": {
+            "format": "date",
+            "title": "Session Start Date",
+            "type": "string"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TargetConstraints"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "profile_revision",
+          "session_start_date",
+          "resume",
+          "target",
+          "confirmed"
+        ],
+        "title": "CandidateProfile",
+        "type": "object"
+      },
+      "CertificationItem-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "canonical_certification_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canonical Certification Id"
+          },
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "extraction_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Extraction Confidence"
+          },
+          "issued": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "issuer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "name",
+          "issuer",
+          "issued"
+        ],
+        "title": "CertificationItem",
+        "type": "object"
+      },
+      "CertificationItem-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "canonical_certification_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canonical Certification Id"
+          },
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "extraction_confidence": {
+            "title": "Extraction Confidence",
+            "type": "string"
+          },
+          "issued": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "issuer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issuer"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "name",
+          "issuer",
+          "issued"
+        ],
+        "title": "CertificationItem",
+        "type": "object"
+      },
+      "ConsentResult": {
+        "additionalProperties": false,
+        "description": "Value-free outcome of an explicit decision.",
+        "properties": {
+          "decided_at": {
+            "format": "date-time",
+            "title": "Decided At",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "declined",
+              "unavailable",
+              "transmitted"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "decision",
+          "decided_at"
+        ],
+        "title": "ConsentResult",
+        "type": "object"
+      },
+      "ConsentSubmission": {
+        "additionalProperties": false,
+        "description": "The user must explicitly approve or decline the pending transmission.",
+        "properties": {
+          "approved": {
+            "title": "Approved",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "approved"
+        ],
+        "title": "ConsentSubmission",
+        "type": "object"
+      },
+      "DegreeLevel": {
+        "enum": [
+          "none",
+          "associate",
+          "bachelors",
+          "masters",
+          "doctorate"
+        ],
+        "title": "DegreeLevel",
+        "type": "string"
+      },
+      "EducationItem-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "coursework": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Coursework",
+            "type": "array"
+          },
+          "degree_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DegreeLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Extraction Confidence"
+          },
+          "field_of_study": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Of Study"
+          },
+          "institution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Institution"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "institution",
+          "degree_level",
+          "field_of_study",
+          "start_date",
+          "end_date",
+          "coursework"
+        ],
+        "title": "EducationItem",
+        "type": "object"
+      },
+      "EducationItem-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "coursework": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Coursework",
+            "type": "array"
+          },
+          "degree_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DegreeLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction_confidence": {
+            "title": "Extraction Confidence",
+            "type": "string"
+          },
+          "field_of_study": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Of Study"
+          },
+          "institution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Institution"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "institution",
+          "degree_level",
+          "field_of_study",
+          "start_date",
+          "end_date",
+          "coursework"
+        ],
+        "title": "EducationItem",
+        "type": "object"
+      },
+      "ExperienceItem-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "date_conflict": {
+            "title": "Date Conflict",
+            "type": "boolean"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Months"
+          },
+          "employer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employer"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Extraction Confidence"
+          },
+          "is_present": {
+            "title": "Is Present",
+            "type": "boolean"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "employer",
+          "title",
+          "start_date",
+          "end_date",
+          "is_present",
+          "duration_months",
+          "description",
+          "date_conflict"
+        ],
+        "title": "ExperienceItem",
+        "type": "object"
+      },
+      "ExperienceItem-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "date_conflict": {
+            "title": "Date Conflict",
+            "type": "boolean"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Months"
+          },
+          "employer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employer"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extraction_confidence": {
+            "title": "Extraction Confidence",
+            "type": "string"
+          },
+          "is_present": {
+            "title": "Is Present",
+            "type": "boolean"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearMonth"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "employer",
+          "title",
+          "start_date",
+          "end_date",
+          "is_present",
+          "duration_months",
+          "description",
+          "date_conflict"
+        ],
+        "title": "ExperienceItem",
         "type": "object"
       },
       "ExtractionResponse": {
@@ -55,6 +994,537 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "JsonValue": {},
+      "ManifestEntry": {
+        "additionalProperties": false,
+        "description": "Value-free history of admitted cloud requests.",
+        "properties": {
+          "field_paths": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Field Paths",
+            "type": "array"
+          },
+          "manifest_version": {
+            "title": "Manifest Version",
+            "type": "string"
+          },
+          "omissions": {
+            "items": {
+              "$ref": "#/components/schemas/OmissionRecord"
+            },
+            "title": "Omissions",
+            "type": "array"
+          },
+          "omitted_paths": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Omitted Paths",
+            "type": "array"
+          },
+          "operation": {
+            "title": "Operation",
+            "type": "string"
+          },
+          "payload_hash": {
+            "title": "Payload Hash",
+            "type": "string"
+          },
+          "transmitted_at": {
+            "format": "date-time",
+            "title": "Transmitted At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "manifest_version",
+          "operation",
+          "field_paths",
+          "omitted_paths",
+          "omissions",
+          "payload_hash",
+          "transmitted_at"
+        ],
+        "title": "ManifestEntry",
+        "type": "object"
+      },
+      "OmissionRecord": {
+        "additionalProperties": false,
+        "description": "One resume-root path absent from the pending projection.",
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "not_required_by_operation",
+              "omitted_for_budget"
+            ],
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "reason"
+        ],
+        "title": "OmissionRecord",
+        "type": "object"
+      },
+      "PendingRequestProjection": {
+        "additionalProperties": false,
+        "description": "Exact admitted values only, for the current session before consent.",
+        "properties": {
+          "admitted_at": {
+            "format": "date-time",
+            "title": "Admitted At",
+            "type": "string"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectedField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "omissions": {
+            "items": {
+              "$ref": "#/components/schemas/OmissionRecord"
+            },
+            "title": "Omissions",
+            "type": "array"
+          },
+          "operation": {
+            "title": "Operation",
+            "type": "string"
+          },
+          "payload_hash": {
+            "title": "Payload Hash",
+            "type": "string"
+          },
+          "provider_identity": {
+            "title": "Provider Identity",
+            "type": "string"
+          },
+          "provider_locality": {
+            "enum": [
+              "cloud",
+              "local",
+              "unavailable"
+            ],
+            "title": "Provider Locality",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "operation",
+          "fields",
+          "payload_hash",
+          "provider_identity",
+          "provider_locality",
+          "admitted_at",
+          "omissions"
+        ],
+        "title": "PendingRequestProjection",
+        "type": "object"
+      },
+      "ProfileUpdate": {
+        "additionalProperties": false,
+        "description": "The complete reviewed resume replacing the current session profile.",
+        "properties": {
+          "resume": {
+            "$ref": "#/components/schemas/StructuredResume-Input"
+          }
+        },
+        "required": [
+          "resume"
+        ],
+        "title": "ProfileUpdate",
+        "type": "object"
+      },
+      "ProjectItem-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "extraction_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Extraction Confidence"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "name",
+          "description"
+        ],
+        "title": "ProjectItem",
+        "type": "object"
+      },
+      "ProjectItem-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "extraction_confidence": {
+            "title": "Extraction Confidence",
+            "type": "string"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "name",
+          "description"
+        ],
+        "title": "ProjectItem",
+        "type": "object"
+      },
+      "ProjectedField": {
+        "additionalProperties": false,
+        "description": "One exact, admitted sanitized value visible only while consent is pending.",
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "value": {
+            "$ref": "#/components/schemas/JsonValue"
+          }
+        },
+        "required": [
+          "path",
+          "value"
+        ],
+        "title": "ProjectedField",
+        "type": "object"
+      },
+      "Provenance": {
+        "additionalProperties": false,
+        "properties": {
+          "block_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Block Ids",
+            "type": "array"
+          },
+          "end_offset": {
+            "title": "End Offset",
+            "type": "integer"
+          },
+          "section_id": {
+            "title": "Section Id",
+            "type": "string"
+          },
+          "start_offset": {
+            "title": "Start Offset",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "section_id",
+          "block_ids",
+          "start_offset",
+          "end_offset"
+        ],
+        "title": "Provenance",
+        "type": "object"
+      },
+      "RequestManifest": {
+        "additionalProperties": false,
+        "description": "The session's bounded, value-free LLM request manifest.",
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/ManifestEntry"
+            },
+            "title": "Entries",
+            "type": "array"
+          }
+        },
+        "required": [
+          "entries"
+        ],
+        "title": "RequestManifest",
+        "type": "object"
+      },
+      "SanitizationSummary": {
+        "additionalProperties": false,
+        "description": "Value-free summary of a completed session sanitization.",
+        "properties": {
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "detector_versions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Detector Versions",
+            "type": "array"
+          },
+          "fail_safe_redaction_count": {
+            "title": "Fail Safe Redaction Count",
+            "type": "integer"
+          },
+          "pii_policy_version": {
+            "title": "Pii Policy Version",
+            "type": "string"
+          },
+          "placeholder_set_version": {
+            "title": "Placeholder Set Version",
+            "type": "string"
+          },
+          "produced_at": {
+            "title": "Produced At",
+            "type": "string"
+          },
+          "profile_revision": {
+            "title": "Profile Revision",
+            "type": "integer"
+          },
+          "removed_categories": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Removed Categories",
+            "type": "array"
+          }
+        },
+        "required": [
+          "content_hash",
+          "profile_revision",
+          "produced_at",
+          "pii_policy_version",
+          "detector_versions",
+          "placeholder_set_version",
+          "removed_categories",
+          "fail_safe_redaction_count"
+        ],
+        "title": "SanitizationSummary",
+        "type": "object"
+      },
+      "SanitizedResume": {
+        "additionalProperties": false,
+        "properties": {
+          "removed_span_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Removed Span Counts",
+            "type": "object"
+          },
+          "resume": {
+            "$ref": "#/components/schemas/StructuredResume-Output"
+          },
+          "schema_version": {
+            "const": "sanitized_resume/1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_profile_revision": {
+            "title": "Source Profile Revision",
+            "type": "integer"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TargetConstraints"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "source_profile_revision",
+          "resume",
+          "target",
+          "removed_span_counts"
+        ],
+        "title": "SanitizedResume",
+        "type": "object"
+      },
+      "SanitizedResumeResult": {
+        "additionalProperties": false,
+        "description": "The complete sanitization result held only in current session state.",
+        "properties": {
+          "artifact_label": {
+            "const": "session_sanitization_result",
+            "title": "Artifact Label",
+            "type": "string"
+          },
+          "fail_safe_redaction_count": {
+            "title": "Fail Safe Redaction Count",
+            "type": "integer"
+          },
+          "removed_categories": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Removed Categories",
+            "type": "array"
+          },
+          "sanitization_result": {
+            "$ref": "#/components/schemas/SanitizedResume"
+          }
+        },
+        "required": [
+          "artifact_label",
+          "sanitization_result",
+          "removed_categories",
+          "fail_safe_redaction_count"
+        ],
+        "title": "SanitizedResumeResult",
+        "type": "object"
+      },
+      "SeniorityId": {
+        "enum": [
+          "intern",
+          "entry",
+          "mid",
+          "senior",
+          "lead",
+          "manager",
+          "director",
+          "executive",
+          "unknown"
+        ],
+        "title": "SeniorityId",
+        "type": "string"
+      },
       "SessionCreated": {
         "additionalProperties": false,
         "properties": {
@@ -95,6 +1565,463 @@
         "title": "SessionDeleted",
         "type": "object"
       },
+      "SkillItem-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "canonical_skill_id": {
+            "title": "Canonical Skill Id",
+            "type": "string"
+          },
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "extraction_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Extraction Confidence"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "surface": {
+            "title": "Surface",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "surface",
+          "canonical_skill_id"
+        ],
+        "title": "SkillItem",
+        "type": "object"
+      },
+      "SkillItem-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "canonical_skill_id": {
+            "title": "Canonical Skill Id",
+            "type": "string"
+          },
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "extraction_confidence": {
+            "title": "Extraction Confidence",
+            "type": "string"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "surface": {
+            "title": "Surface",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "surface",
+          "canonical_skill_id"
+        ],
+        "title": "SkillItem",
+        "type": "object"
+      },
+      "StructuredResume-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "achievements": {
+            "items": {
+              "$ref": "#/components/schemas/AchievementItem-Input"
+            },
+            "title": "Achievements",
+            "type": "array"
+          },
+          "certifications": {
+            "items": {
+              "$ref": "#/components/schemas/CertificationItem-Input"
+            },
+            "title": "Certifications",
+            "type": "array"
+          },
+          "education": {
+            "items": {
+              "$ref": "#/components/schemas/EducationItem-Input"
+            },
+            "title": "Education",
+            "type": "array"
+          },
+          "experience": {
+            "items": {
+              "$ref": "#/components/schemas/ExperienceItem-Input"
+            },
+            "title": "Experience",
+            "type": "array"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectItem-Input"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "structured_resume/1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillItem-Input"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "unclassified": {
+            "items": {
+              "$ref": "#/components/schemas/UnclassifiedItem-Input"
+            },
+            "title": "Unclassified",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "summary",
+          "skills",
+          "experience",
+          "education",
+          "projects",
+          "certifications",
+          "achievements",
+          "unclassified"
+        ],
+        "title": "StructuredResume",
+        "type": "object"
+      },
+      "StructuredResume-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "achievements": {
+            "items": {
+              "$ref": "#/components/schemas/AchievementItem-Output"
+            },
+            "title": "Achievements",
+            "type": "array"
+          },
+          "certifications": {
+            "items": {
+              "$ref": "#/components/schemas/CertificationItem-Output"
+            },
+            "title": "Certifications",
+            "type": "array"
+          },
+          "education": {
+            "items": {
+              "$ref": "#/components/schemas/EducationItem-Output"
+            },
+            "title": "Education",
+            "type": "array"
+          },
+          "experience": {
+            "items": {
+              "$ref": "#/components/schemas/ExperienceItem-Output"
+            },
+            "title": "Experience",
+            "type": "array"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectItem-Output"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "structured_resume/1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillItem-Output"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "unclassified": {
+            "items": {
+              "$ref": "#/components/schemas/UnclassifiedItem-Output"
+            },
+            "title": "Unclassified",
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "summary",
+          "skills",
+          "experience",
+          "education",
+          "projects",
+          "certifications",
+          "achievements",
+          "unclassified"
+        ],
+        "title": "StructuredResume",
+        "type": "object"
+      },
+      "TargetConstraints": {
+        "additionalProperties": false,
+        "properties": {
+          "domain_id": {
+            "title": "Domain Id",
+            "type": "string"
+          },
+          "locations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Locations",
+            "type": "array"
+          },
+          "role_id": {
+            "title": "Role Id",
+            "type": "string"
+          },
+          "seniority_id": {
+            "$ref": "#/components/schemas/SeniorityId"
+          },
+          "work_modes": {
+            "items": {
+              "$ref": "#/components/schemas/WorkMode"
+            },
+            "title": "Work Modes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "domain_id",
+          "role_id",
+          "seniority_id",
+          "locations",
+          "work_modes"
+        ],
+        "title": "TargetConstraints",
+        "type": "object"
+      },
+      "UnclassifiedItem-Input": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "extraction_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Extraction Confidence"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "text"
+        ],
+        "title": "UnclassifiedItem",
+        "type": "object"
+      },
+      "UnclassifiedItem-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_inputs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Confidence Inputs",
+            "type": "array"
+          },
+          "extraction_confidence": {
+            "title": "Extraction Confidence",
+            "type": "string"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "extracted",
+              "user_provided"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Provenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_text": {
+            "title": "Source Text",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "origin",
+          "extraction_confidence",
+          "confidence_inputs",
+          "provenance",
+          "source_text",
+          "text"
+        ],
+        "title": "UnclassifiedItem",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -126,6 +2053,35 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "WorkMode": {
+        "enum": [
+          "onsite",
+          "hybrid",
+          "remote",
+          "unknown"
+        ],
+        "title": "WorkMode",
+        "type": "string"
+      },
+      "YearMonth": {
+        "additionalProperties": false,
+        "properties": {
+          "month": {
+            "title": "Month",
+            "type": "integer"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "year",
+          "month"
+        ],
+        "title": "YearMonth",
         "type": "object"
       }
     }
@@ -247,6 +2203,365 @@
         "summary": "Create Session"
       }
     },
+    "/api/v1/sessions/llm-requests": {
+      "get": {
+        "operationId": "llm_request_manifest_api_v1_sessions_llm_requests_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestManifest"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Llm Request Manifest"
+      }
+    },
+    "/api/v1/sessions/llm-requests/pending": {
+      "get": {
+        "operationId": "pending_llm_request_api_v1_sessions_llm_requests_pending_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingRequestProjection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Pending Llm Request"
+      }
+    },
+    "/api/v1/sessions/llm-requests/{request_id}/consent": {
+      "post": {
+        "operationId": "consent_to_llm_request_api_v1_sessions_llm_requests__request_id__consent_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentSubmission"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Consent To Llm Request"
+      }
+    },
+    "/api/v1/sessions/profile": {
+      "get": {
+        "operationId": "get_profile_api_v1_sessions_profile_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateProfile"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Profile"
+      },
+      "put": {
+        "operationId": "update_profile_api_v1_sessions_profile_put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateProfile"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Profile"
+      }
+    },
+    "/api/v1/sessions/profile/confirm": {
+      "post": {
+        "operationId": "confirm_profile_api_v1_sessions_profile_confirm_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TargetConstraints"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateProfile"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirm Profile"
+      }
+    },
+    "/api/v1/sessions/profile/draft": {
+      "post": {
+        "operationId": "draft_profile_api_v1_sessions_profile_draft_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StructuredResume-Output"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Draft Profile"
+      }
+    },
     "/api/v1/sessions/resume": {
       "post": {
         "operationId": "upload_resume_api_v1_sessions_resume_post",
@@ -301,6 +2616,98 @@
           }
         },
         "summary": "Upload Resume"
+      }
+    },
+    "/api/v1/sessions/sanitize": {
+      "post": {
+        "operationId": "sanitize_api_v1_sessions_sanitize_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SanitizationSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sanitize"
+      }
+    },
+    "/api/v1/sessions/sanitized-resume": {
+      "get": {
+        "operationId": "sanitized_resume_api_v1_sessions_sanitized_resume_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Session-Token",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Session-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SanitizedResumeResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sanitized Resume"
       }
     }
   }

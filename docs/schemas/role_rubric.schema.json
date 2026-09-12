@@ -1,0 +1,502 @@
+{
+  "$defs": {
+    "AlternativeGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "display": {
+          "title": "Display",
+          "type": "string"
+        },
+        "group_id": {
+          "title": "Group Id",
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Members",
+          "type": "array"
+        },
+        "min_evidence_level": {
+          "title": "Min Evidence Level",
+          "type": "integer"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "group_id",
+        "display",
+        "weight",
+        "min_evidence_level",
+        "members"
+      ],
+      "title": "AlternativeGroup",
+      "type": "object"
+    },
+    "CertificationExpectation": {
+      "additionalProperties": false,
+      "properties": {
+        "certification_id": {
+          "title": "Certification Id",
+          "type": "string"
+        },
+        "required": {
+          "title": "Required",
+          "type": "boolean"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "certification_id",
+        "required",
+        "weight"
+      ],
+      "title": "CertificationExpectation",
+      "type": "object"
+    },
+    "EducationExpectations": {
+      "additionalProperties": false,
+      "properties": {
+        "min_degree_level": {
+          "enum": [
+            "none",
+            "associate",
+            "bachelors",
+            "masters",
+            "doctorate"
+          ],
+          "title": "Min Degree Level",
+          "type": "string"
+        },
+        "preferred_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Preferred Fields",
+          "type": "array"
+        },
+        "required": {
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "min_degree_level",
+        "preferred_fields",
+        "required"
+      ],
+      "title": "EducationExpectations",
+      "type": "object"
+    },
+    "ExperienceBand": {
+      "additionalProperties": false,
+      "properties": {
+        "band_id": {
+          "title": "Band Id",
+          "type": "string"
+        },
+        "max_years": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Years"
+        },
+        "min_years": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Min Years"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Score"
+        }
+      },
+      "required": [
+        "band_id",
+        "min_years",
+        "max_years",
+        "score"
+      ],
+      "title": "ExperienceBand",
+      "type": "object"
+    },
+    "PenaltyCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "no_item_in_section",
+            "signal_below_level",
+            "all_signals_absent_in_category",
+            "total_experience_below"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "section": {
+          "anyOf": [
+            {
+              "enum": [
+                "skills",
+                "experience",
+                "education",
+                "projects",
+                "certifications",
+                "achievements",
+                "unclassified"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section"
+        },
+        "threshold_months": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Threshold Months"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "PenaltyCondition",
+      "type": "object"
+    },
+    "RubricCategory": {
+      "additionalProperties": false,
+      "properties": {
+        "alternative_groups": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AlternativeGroup"
+          },
+          "title": "Alternative Groups",
+          "type": "array"
+        },
+        "category_id": {
+          "title": "Category Id",
+          "type": "string"
+        },
+        "display": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display"
+        },
+        "signals": {
+          "items": {
+            "$ref": "#/$defs/Signal"
+          },
+          "title": "Signals",
+          "type": "array"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "category_id",
+        "weight",
+        "signals"
+      ],
+      "title": "RubricCategory",
+      "type": "object"
+    },
+    "RubricPenalty": {
+      "additionalProperties": false,
+      "properties": {
+        "applies_to_category": {
+          "title": "Applies To Category",
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/$defs/PenaltyCondition"
+        },
+        "penalty_id": {
+          "title": "Penalty Id",
+          "type": "string"
+        },
+        "points": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Points"
+        }
+      },
+      "required": [
+        "penalty_id",
+        "applies_to_category",
+        "points",
+        "condition"
+      ],
+      "title": "RubricPenalty",
+      "type": "object"
+    },
+    "Signal": {
+      "additionalProperties": false,
+      "properties": {
+        "min_evidence_level": {
+          "title": "Min Evidence Level",
+          "type": "integer"
+        },
+        "penalty_points": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Penalty Points"
+        },
+        "required": {
+          "title": "Required",
+          "type": "boolean"
+        },
+        "signal_id": {
+          "title": "Signal Id",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/SignalTargetRef"
+        },
+        "type": {
+          "enum": [
+            "skill",
+            "experience_band",
+            "education",
+            "certification",
+            "flag"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "signal_id",
+        "type",
+        "target",
+        "weight",
+        "min_evidence_level",
+        "required"
+      ],
+      "title": "Signal",
+      "type": "object"
+    },
+    "SignalTargetRef": {
+      "additionalProperties": false,
+      "description": "A closed, typed target for a deterministic signal resolver.",
+      "properties": {
+        "target_id": {
+          "title": "Target Id",
+          "type": "string"
+        },
+        "target_type": {
+          "enum": [
+            "canonical_skill",
+            "experience_band",
+            "education_requirement",
+            "certification",
+            "closed_flag"
+          ],
+          "title": "Target Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_type",
+        "target_id"
+      ],
+      "title": "SignalTargetRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "categories": {
+      "items": {
+        "$ref": "#/$defs/RubricCategory"
+      },
+      "title": "Categories",
+      "type": "array"
+    },
+    "certification_expectations": {
+      "items": {
+        "$ref": "#/$defs/CertificationExpectation"
+      },
+      "title": "Certification Expectations",
+      "type": "array"
+    },
+    "domain_id": {
+      "title": "Domain Id",
+      "type": "string"
+    },
+    "education_expectations": {
+      "$ref": "#/$defs/EducationExpectations"
+    },
+    "experience_bands": {
+      "items": {
+        "$ref": "#/$defs/ExperienceBand"
+      },
+      "title": "Experience Bands",
+      "type": "array"
+    },
+    "penalties": {
+      "items": {
+        "$ref": "#/$defs/RubricPenalty"
+      },
+      "title": "Penalties",
+      "type": "array"
+    },
+    "role_family": {
+      "title": "Role Family",
+      "type": "string"
+    },
+    "role_id": {
+      "title": "Role Id",
+      "type": "string"
+    },
+    "rubric_id": {
+      "title": "Rubric Id",
+      "type": "string"
+    },
+    "rubric_version": {
+      "title": "Rubric Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "role_rubric/1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seniority_id": {
+      "title": "Seniority Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "reviewed",
+        "stable"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "weight_basis": {
+      "title": "Weight Basis",
+      "type": "string"
+    },
+    "weight_basis_note": {
+      "title": "Weight Basis Note",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "rubric_id",
+    "role_id",
+    "role_family",
+    "domain_id",
+    "seniority_id",
+    "rubric_version",
+    "status",
+    "weight_basis",
+    "weight_basis_note",
+    "experience_bands",
+    "education_expectations",
+    "certification_expectations",
+    "categories",
+    "penalties"
+  ],
+  "title": "RoleRubric",
+  "type": "object"
+}

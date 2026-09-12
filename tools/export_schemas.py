@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -12,6 +13,7 @@ sys.path.insert(0, str(ROOT / "backend" / "src"))
 from resumematch.api.app import app  # noqa: E402
 from resumematch.core.schemas.candidate import CandidateProfile, StructuredResume  # noqa: E402
 from resumematch.core.schemas.job import JobPosting  # noqa: E402
+from resumematch.core.schemas.rubric import RoleRubric  # noqa: E402
 
 
 def main() -> None:
@@ -22,6 +24,7 @@ def main() -> None:
     for filename, model in (
         ("candidate_profile.schema.json", CandidateProfile),
         ("job_posting.schema.json", JobPosting),
+        ("role_rubric.schema.json", RoleRubric),
         ("structured_resume.schema.json", StructuredResume),
     ):
         (ROOT / "docs" / "schemas" / filename).write_text(
@@ -34,7 +37,7 @@ def main() -> None:
         schema = components[name]
         properties = schema.get("properties", {})
         required = set(schema.get("required", []))
-        declarations.append(f"export interface {name} {{")
+        declarations.append(f"export interface {_typescript_identifier(name)} {{")
         for field in sorted(properties):
             value = properties[field]
             primitive = {"string": "string", "integer": "number", "boolean": "boolean"}.get(
@@ -45,6 +48,13 @@ def main() -> None:
         declarations.append("}")
         declarations.append("")
     types_path.write_text("\n".join(declarations), encoding="utf-8")
+
+
+def _typescript_identifier(name: str) -> str:
+    """Render one OpenAPI component key as a stable TypeScript identifier."""
+
+    identifier = re.sub(r"[^A-Za-z0-9_$]", "_", name)
+    return identifier if identifier and not identifier[0].isdigit() else f"_{identifier}"
 
 
 if __name__ == "__main__":
