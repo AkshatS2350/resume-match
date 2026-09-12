@@ -5,7 +5,12 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from resumematch.core.clock import FixedClock
-from resumematch.core.session import CloudLLMRequestManifestEntry, Session, SessionStore
+from resumematch.core.session import (
+    CloudLLMOmissionRecord,
+    CloudLLMRequestManifestEntry,
+    Session,
+    SessionStore,
+)
 
 
 def _entry(index: int) -> CloudLLMRequestManifestEntry:
@@ -14,6 +19,9 @@ def _entry(index: int) -> CloudLLMRequestManifestEntry:
         operation="bounded_extract",
         field_paths=(f"/unclassified/{index}/text",),
         omitted_paths=(f"/summary/{index}",),
+        omissions=(
+            CloudLLMOmissionRecord(path=f"/summary/{index}", reason="omitted_for_budget"),
+        ),
         payload_hash=f"sha256:{index:064x}",
         transmitted_at=datetime(2026, 1, 1, tzinfo=UTC),
     )
@@ -27,6 +35,7 @@ def test_manifest_entry_contains_only_value_free_metadata() -> None:
         "omitted_paths",
         "payload_hash",
         "transmitted_at",
+        "omissions",
     )
 
 

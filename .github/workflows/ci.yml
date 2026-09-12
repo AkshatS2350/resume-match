@@ -35,6 +35,14 @@ jobs:
       - run: npm ci --prefix web
       - run: npm run lint --prefix web
       - run: npm run typecheck --prefix web
+  a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm ci --prefix web
+      - run: npx --prefix web playwright install --with-deps chromium
+      - run: npm run test:a11y --prefix web
   boundary:
     runs-on: ubuntu-latest
     steps:
@@ -48,6 +56,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+      - run: test -f backend/tests/privacy/test_no_candidate_leak.py
+      - run: uv run --project backend pytest -q backend/tests/privacy/test_no_candidate_leak.py
       - run: uv run --project backend pytest backend/tests/privacy
       - run: uv run --project backend python tools/check_prohibited_claims.py
   pii-gates:

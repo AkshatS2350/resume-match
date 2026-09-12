@@ -10,7 +10,12 @@ export function UploadPanel({ errorCode }: UploadPanelProps) {
     <section aria-label="Resume upload">
       <p>Upload a PDF or DOCX file. Maximum size: 10 MB.</p>
       <input aria-label="Resume file" type="file" accept="application/pdf,.docx" />
-      {isScan ? <p>Your file appears to be a scan or image. OCR is not supported; upload a text-based PDF or DOCX.</p> : null}
+      {isScan ? (
+        <p role="alert">
+          Your file appears to be a scan or image. OCR is not supported; upload a text-based PDF or
+          DOCX.
+        </p>
+      ) : null}
     </section>
   );
 }

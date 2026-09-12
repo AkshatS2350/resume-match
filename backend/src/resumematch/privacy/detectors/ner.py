@@ -11,6 +11,7 @@ from typing import Protocol
 import spacy
 import yaml
 from presidio_analyzer import AnalyzerEngine
+from presidio_analyzer.nlp_engine import NlpEngineProvider
 
 from resumematch.privacy.detectors.rules import Detection
 
@@ -73,7 +74,13 @@ def load_local_presidio_analyzer(config: PresidioModelConfig) -> AnalyzerEngine:
     if model.meta.get("version") != config.model_version:
         raise PresidioModelUnavailableError("approved Presidio model version is incompatible")
     try:
-        return AnalyzerEngine()
+        nlp_engine = NlpEngineProvider(
+            nlp_configuration={
+                "nlp_engine_name": "spacy",
+                "models": [{"lang_code": "en", "model_name": config.model_name}],
+            }
+        ).create_engine()
+        return AnalyzerEngine(nlp_engine=nlp_engine)
     except Exception as error:
         raise PresidioModelUnavailableError("approved Presidio analyzer is unavailable") from error
 

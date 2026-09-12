@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
+import { ConfirmProfileDialog } from "../../components/ConfirmProfileDialog";
 import { ProfileSectionEditor, profileSections, type ProfileSection, type ReviewItem } from "../../components/ProfileSectionEditor";
 
 const reviewStorageKey = "resumematch.profile.review";
@@ -22,6 +23,7 @@ function emptyDraft(): ReviewDraft {
 
 function ProfileReviewPage() {
   const [draft, setDraft] = useState<ReviewDraft>(emptyDraft);
+  const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
     const saved = window.sessionStorage.getItem(reviewStorageKey);
@@ -50,6 +52,12 @@ function ProfileReviewPage() {
           onChange={(items) => setDraft((current) => ({ ...current, [section]: items }))}
         />
       ))}
+      <ConfirmProfileDialog
+        experience={draft.experience}
+        onConfirm={() => setConfirmed(true)}
+        skills={draft.skills}
+      />
+      {confirmed ? <p role="status">Profile confirmation is ready to continue.</p> : null}
     </main>
   );
 }

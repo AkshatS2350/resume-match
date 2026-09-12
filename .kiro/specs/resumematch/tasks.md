@@ -529,7 +529,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
   - _Requirements: RM-REV-001 c2, c3, c5, c7; RM-PARSE-005 c5; RM-SESS-001 c3, c4_ · _Design: API Boundaries; D-44_
   - Done when: component tests assert an editable control exists for every section including `unclassified`; assert an item at confidence 0.59 renders the needs-review marker and its source text while 0.60 does not; assert changing an end date updates the displayed duration without a server round trip; assert only `sessionStorage` is written (spy on `localStorage.setItem` and assert zero calls); assert the storage copy says "session-scoped browser storage" and never "never stored".
 
-- [ ] 13.4 [P0] Add the empty-profile confirmation warning
+- [x] 13.4 [P0] Add the empty-profile confirmation warning
   - Files: `web/src/components/ConfirmProfileDialog.tsx`, `web/tests/ConfirmProfileDialog.test.tsx`
   - Work: when both `skills` and `experience` are empty at confirm time, warn that readiness scoring will produce a near-zero result and require an explicit second confirmation before proceeding.
   - Depends on: 13.3
@@ -538,7 +538,7 @@ Built now, against an empty package, so the contracts never have to be weakened 
 
 #### 14. Accessibility
 
-- [ ] 14.1 [P1] Make the review and upload screens keyboard-operable and screen-reader-announced, and add the axe gate
+- [x] 14.1 [P1] Make the review and upload screens keyboard-operable and screen-reader-announced, and add the axe gate
   - Files: `web/src/components/*`, `web/e2e/a11y.spec.ts`, `.github/workflows/ci.yml`, `docs/accessibility.md`
   - Work: every interactive control operable by keyboard alone; an accessible name on every control, button, and link; contrast at least 4.5:1 for normal text and 3:1 for large text; errors announced through a live region. Add `axe-core` via Playwright over the upload and review screens as the `a11y` CI job. Document that automated checks are partial and that full WCAG conformance requires manual assistive-technology testing and expert review.
   - Depends on: 13.3, 9.8
@@ -728,14 +728,14 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
   - _Requirements: RM-PRIV-002 c6, c7; RM-TEST-001 c9_ · _Design: Build gates — `pii-gates`_
   - Done when: the job prints one recall and one precision figure per category; deleting one labeled instance from a 20-instance category fails the job naming that category; artificially lowering one category's precision by 0.06 fails the job naming that category and both figures.
 
-- [ ] 20.2 [P0] Implement the candidate-data leak property test and the `privacy` gate
+- [x] 20.2 [P0] Implement the candidate-data leak property test and the `privacy` gate
   - Files: `backend/tests/privacy/test_no_candidate_leak.py`, `.github/workflows/ci.yml`
   - Work: a `marker_profiles()` Hypothesis strategy seeding unique high-entropy markers in every text field. Run the whole pipeline, including exception paths, and assert no marker appears in any captured log record, metric label, trace attribute, exception message, session token, or persistent-store location. Assert no upload's raw bytes or `ExtractedText` remains at any filesystem location after the response returns. Assert no path writes candidate data to a persistent store.
   - Depends on: 12.5, 17.4, 3.6, 5.2
   - _Requirements: RM-PRIV-001 c2, c3, c5, c7, c9; RM-OBS-002 c1–c6; RM-SESS-001 c1; RM-SEC-001 c5; RM-ING-001 c6; RM-TEST-001 c7_ · _Design: Failure isolation; Observability_ · _Property: 25_
   - Done when: the test passes at 100 examples; deliberately adding `emit_log(event="x", note=profile.resume.summary)` fails on the allow-list before the marker assertion is even reached; deliberately logging a raw exception message containing a marker fails the marker assertion; the `privacy` job runs this test with no override path.
 
-- [ ] 20.3 [P0] Add the policy-flip property test
+- [x] 20.3 [P0] Add the policy-flip property test
   - Files: `backend/tests/properties/test_policy_flip.py`
   - Work: for each PII category, flip its default in `config/pii_policy.yaml` between Retain and Remove and assert the `Sanitized_Resume` for a fixture containing that category changes correspondingly, with no Python source file modified.
   - Depends on: 16.2, 17.2
@@ -744,14 +744,14 @@ The enforcement scaffolding already exists from M0 (Deviation 2). This milestone
 
 #### 21. Privacy_Inspector
 
-- [ ] 21.1 [P1] Implement the pending-request and manifest endpoints
+- [x] 21.1 [P1] Implement the pending-request and manifest endpoints
   - Files: `backend/src/resumematch/api/routers/privacy.py`, `backend/src/resumematch/api/dto/privacy.py`, `backend/tests/integration/test_pending_request.py`
   - Work: `GET /api/v1/sessions/llm-requests/pending` returning the `paths`, the resolved values for exactly those paths, the `payload_hash`, the provider identity and locality, and the omission diff labelling each omitted path `not_required_by_operation` or `omitted_for_budget`. `GET /api/v1/sessions/llm-requests` returning the manifest (paths, hashes, times, no values). `POST /api/v1/sessions/llm-requests/{id}/consent` granting or declining, with transmission only on grant.
   - Depends on: 18.4, 18.5, 17.5
   - _Requirements: RM-PRIV-004 c1, c2, c4, c5, c7; RM-PRIV-003 c8_ · _Design: Privacy_Inspector data_ · _Property: 22, 23_
   - Done when: a test asserts the pending response model has **no** field named for or documented as the full `Sanitized_Resume`; a test asserts every path present in the `Sanitized_Resume` and absent from the projection appears in the omission diff with exactly one of the two labels; a test asserts declining consent yields zero stub-provider invocations and a completed deterministic workflow.
 
-- [ ] 21.2 [P1] Build the Privacy_Inspector screens
+- [x] 21.2 [P1] Build the Privacy_Inspector screens
   - Files: `web/src/app/privacy/page.tsx`, `web/src/components/PendingRequestView.tsx`, `web/src/components/SanitizationResultView.tsx`, `web/tests/privacy-inspector.test.tsx`
   - Work: two distinct views. The primary "what will be sent" view renders the exact pending projection with a control revealing its complete serialized form. A separate view, labelled as the sanitization result held in Session state and **not** as the transmitted payload, renders the full `Sanitized_Resume`. Show the removed-category list, the fail-safe redaction count, the provider identity and whether it executes locally or across the boundary, and the omission diff with its reasons.
   - Depends on: 21.1

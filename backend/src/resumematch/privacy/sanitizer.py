@@ -41,7 +41,12 @@ class Sanitizer:
     ) -> SanitizedValue:
         if self._retains_whole_value(path):
             return SanitizedValue(value)
-        spans = resolve_spans(detections)
+        removable = tuple(
+            detection
+            for detection in detections
+            if self.policy.default_for(detection.category) == "Remove"
+        )
+        spans = resolve_spans(removable)
         redacted = value
         for span in reversed(spans):
             token = self.placeholders.tokens[span.category]

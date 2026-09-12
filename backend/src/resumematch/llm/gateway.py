@@ -5,10 +5,19 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Protocol, overload, runtime_checkable
 
+from pydantic import JsonValue
+
 from resumematch.core.canonical_json import canonical_sha256
 from resumematch.core.clock import Clock
 from resumematch.core.schemas.sanitized import SanitizedResume
-from resumematch.core.session import CloudLLMRequestManifestEntry, Session
+from resumematch.core.session import (
+    CloudLLMOmissionRecord,
+    CloudLLMRequestManifestEntry,
+    LLMConsentState,
+    PendingCloudLLMRequest,
+    ProjectedField,
+    Session,
+)
 from resumematch.llm.budget import (
     BudgetExceeded,
     PayloadBudget,
@@ -24,6 +33,7 @@ from resumematch.llm.projection import (
     resolve_operation,
     resolves_operation,
 )
+from resumematch.llm.provider_api import LLMProvider
 from resumematch.llm.schemas.operations import OPERATION_SPECS
 
 
@@ -55,6 +65,64 @@ class AdmissionDenied:
 class AdmittedPayload:
     payload: dict[FieldPath, PayloadValue]
     reduction: ReducedPayload
+
+
+def stage_pending_request(
+    session: Session,
+    request: ProjectionRequest,
+    provider: LLMProvider,
+    budget: PayloadBudget = PayloadBudget(10_000, "budget_priority@1"),
+    optional_path_priority: tuple[FieldPath, ...] = (),
+    *,
+    clock: Clock,
+) -> PendingCloudLLMRequest | AdmissionDenied | BudgetExceeded:
+    """Admit first, then retain the exact resulting projection for consent review."""
+
+    admitted = admit(session, request, budget, optional_path_priority, clock=clock)
+    if not isinstance(admitted, AdmittedPayload):
+        return admitted
+    pending = PendingCloudLLMRequest(
+        request_id=canonical_sha256(
+            {"operation": request.operation, "payload_hash": canonical_sha256(admitted.payload)}
+        ),
+        operation=request.operation,
+        fields=tuple(
+            ProjectedField(path=str(path), value=_json_value(value))
+            for path, value in admitted.payload.items()
+        ),
+        payload_hash=canonical_sha256(dict(admitted.payload)),
+        provider_identity=provider.identity,
+        provider_locality=provider.locality,
+        admitted_at=clock.now(),
+        budget_omitted_paths=tuple(str(path) for path in admitted.reduction.dropped_paths),
+    )
+    session.set_pending_llm_request(pending)
+    return pending
+
+
+def record_consent(
+    session: Session,
+    request_id: str,
+    approved: bool,
+    provider: LLMProvider,
+    *,
+    clock: Clock,
+) -> LLMConsentState | None:
+    """Apply an explicit decision; only this gateway function can invoke a provider."""
+
+    pending = session.pending_llm_request
+    if pending is None or pending.request_id != request_id:
+        return None
+    if not approved:
+        state = LLMConsentState(request_id=request_id, decision="declined", decided_at=clock.now())
+        session.consent = state
+        session.pending_llm_request = None
+        return state
+    outcome = provider.transmit(pending)
+    state = LLMConsentState(request_id=request_id, decision=outcome, decided_at=clock.now())
+    session.consent = state
+    session.pending_llm_request = None
+    return state
 
 
 def admit_payload(
@@ -142,6 +210,10 @@ def admit(
             operation=request.operation,
             field_paths=tuple(str(path) for path in admitted.payload),
             omitted_paths=tuple(str(path) for path in admitted.reduction.dropped_paths),
+            omissions=tuple(
+                CloudLLMOmissionRecord(path=str(path), reason="omitted_for_budget")
+                for path in admitted.reduction.dropped_paths
+            ),
             payload_hash=canonical_sha256(dict(admitted.payload)),
             transmitted_at=clock.now(),
         )
@@ -173,3 +245,13 @@ def _payload_value(value: object) -> PayloadValue:
     if isinstance(value, Mapping):
         return {str(key): _payload_value(item) for key, item in value.items()}
     raise TypeError("resolved sanitized value is not a payload value")
+
+
+def _json_value(value: PayloadValue) -> JsonValue:
+    """Render an admitted value into the immutable session model's JSON type."""
+
+    if value is None or isinstance(value, str | int | bool):
+        return value
+    if isinstance(value, tuple):
+        return [_json_value(item) for item in value]
+    return {key: _json_value(item) for key, item in value.items()}

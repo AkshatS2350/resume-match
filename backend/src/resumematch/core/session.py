@@ -10,6 +10,8 @@ from datetime import date, datetime, timedelta
 from threading import RLock
 from typing import Literal
 
+from pydantic import BaseModel, ConfigDict, JsonValue
+
 from .clock import Clock
 from .schemas.candidate import CandidateProfile
 from .schemas.sanitized import SanitizedResume
@@ -28,6 +30,17 @@ class _SanitizedResumeRef:
 
 
 ManifestVersion = Literal["cloud_llm_request_manifest@1"]
+ProviderLocality = Literal["cloud", "local", "unavailable"]
+ConsentDecision = Literal["pending", "granted", "declined", "unavailable", "transmitted"]
+ManifestOmissionReason = Literal["omitted_for_budget"]
+
+
+@dataclass(frozen=True)
+class CloudLLMOmissionRecord:
+    """A value-free, deterministic admission-time omission record."""
+
+    path: str
+    reason: ManifestOmissionReason
 
 
 @dataclass(frozen=True)
@@ -40,10 +53,41 @@ class CloudLLMRequestManifestEntry:
     omitted_paths: tuple[str, ...]
     payload_hash: str
     transmitted_at: datetime
+    omissions: tuple[CloudLLMOmissionRecord, ...] = ()
 
 
-class _PendingRequestRef:
-    pass
+class ProjectedField(BaseModel):
+    """One exact, admitted sanitized value visible only while consent is pending."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    path: str
+    value: JsonValue
+
+
+class PendingCloudLLMRequest(BaseModel):
+    """Session-only, already-admitted projection awaiting an explicit decision."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    request_id: str
+    operation: str
+    fields: tuple[ProjectedField, ...]
+    payload_hash: str
+    provider_identity: str
+    provider_locality: ProviderLocality
+    admitted_at: datetime
+    budget_omitted_paths: tuple[str, ...] = ()
+
+
+class LLMConsentState(BaseModel):
+    """The current request's explicit, session-bound transmission decision."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    request_id: str
+    decision: ConsentDecision
+    decided_at: datetime | None
 
 
 class _ReadinessResultRef:
@@ -51,10 +95,6 @@ class _ReadinessResultRef:
 
 
 class _MatchResultSetRef:
-    pass
-
-
-class _ConsentStateRef:
     pass
 
 
@@ -71,10 +111,10 @@ class Session:
         self._sanitized_resume: SanitizedResume | None = None
         self._sanitization_record: object | None = None
         self.llm_manifest: deque[CloudLLMRequestManifestEntry] = deque(maxlen=200)
-        self.pending_llm_request: _PendingRequestRef | None = None
+        self.pending_llm_request: PendingCloudLLMRequest | None = None
         self.readiness_result: _ReadinessResultRef | None = None
         self.match_result_set: _MatchResultSetRef | None = None
-        self.consent = _ConsentStateRef()
+        self.consent: LLMConsentState | None = None
 
     @property
     def sanitized_resume(self) -> SanitizedResume | None:
@@ -89,6 +129,16 @@ class Session:
 
         self.llm_manifest.append(entry)
 
+    def set_pending_llm_request(self, request: PendingCloudLLMRequest) -> None:
+        """Retain one gateway-admitted projection within this session only."""
+
+        self.pending_llm_request = request
+        self.consent = LLMConsentState(
+            request_id=request.request_id,
+            decision="pending",
+            decided_at=None,
+        )
+
     def clear_candidate_data(self) -> None:
         """Discard every session-only candidate artifact and its request metadata."""
 
@@ -99,6 +149,7 @@ class Session:
         self._sanitization_record = None
         self.llm_manifest.clear()
         self.pending_llm_request = None
+        self.consent = None
         self.readiness_result = None
         self.match_result_set = None
 

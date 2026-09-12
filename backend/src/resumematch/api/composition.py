@@ -9,6 +9,7 @@ from resumematch.core.clock import Clock, SystemClock
 from resumematch.core.config import Settings
 from resumematch.core.egress import EgressEnclave, EgressGrant, issue_grant
 from resumematch.core.session import SessionStore
+from resumematch.llm.provider_api import LLMProvider, UnconfiguredLLMProvider
 from resumematch.privacy.detector import PIIDetector
 from resumematch.privacy.detectors.ner import LocalPresidioNerDetector, load_presidio_model_config
 from resumematch.privacy.detectors.rules import load_rule_detector
@@ -41,6 +42,7 @@ class ApplicationComponents:
     session_store: SessionStore
     settings: Settings
     llm_grant: EgressGrant
+    llm_provider: LLMProvider
     job_source_grant: EgressGrant
     section_headings: SectionHeadings
     skill_normalizer: SkillNormalizer
@@ -59,6 +61,7 @@ def build_components() -> ApplicationComponents:
         session_store=SessionStore(clock),
         settings=Settings(()),
         llm_grant=issue_grant(egress_settings, "llm_provider"),
+        llm_provider=UnconfiguredLLMProvider(),
         job_source_grant=issue_grant(egress_settings, "job_source"),
         section_headings=load_section_headings(_ROOT / "config" / "section_headings.yaml"),
         skill_normalizer=SkillNormalizer(load_aliases(_ROOT / "ontology" / "skills.yaml")),

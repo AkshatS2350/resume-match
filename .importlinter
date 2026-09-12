@@ -47,7 +47,19 @@ unmatched_ignore_imports_alerting = none
 [importlinter:contract:provider_api]
 name = Only the gateway may see the LLM_Provider interface (RM-PRIV-003 c1)
 type = forbidden
-source_modules = resumematch
+source_modules =
+    resumematch.api
+    resumematch.coach
+    resumematch.matching
+    resumematch.job
+    resumematch.rubric
+    resumematch.privacy
+    resumematch.resume
+    resumematch.skill
+    resumematch.core
+    resumematch.llm.budget
+    resumematch.llm.projection
+    resumematch.llm.schemas
 forbidden_modules = resumematch.llm.provider_api
 ignore_imports =
     resumematch.llm.gateway -> resumematch.llm.provider_api
